@@ -1,0 +1,35 @@
+{
+  "name": "database-connector",
+  "version": "4.2.1",
+  "authors": [
+    "dbdev",
+    "sqlexpert",
+    "dataengineer"
+  ],
+  "Supported_Platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "description": "Database connectivity library",
+  "long_description": "Universal database connector supporting MySQL, PostgreSQL, SQLite, and more with connection pooling and transaction management.",
+  "license": "GPL-3.0",
+  "license_url": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "keywords": [
+    "database",
+    "sql",
+    "connector"
+  ],
+  "tags": [
+    "database",
+    "sql"
+  ],
+  "homepage": "https://example.com/database-connector",
+  "issue_tracker": "https://github.com/dbdev/database-connector/issues",
+  "git": "https://github.com/dbdev/database-connector.git",
+  "installer": "db_setup.sh",
+  "dependencies": [
+    "libpq@13.0",
+    "sqlite@3.36"
+  ]
+}

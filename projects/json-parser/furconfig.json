@@ -1,0 +1,31 @@
+{
+  "name": "json-parser",
+  "version": "1.5.3",
+  "authors": [
+    "jsondev"
+  ],
+  "Supported_Platforms": [
+    "linux",
+    "macos"
+  ],
+  "description": "Fast JSON parsing library",
+  "long_description": "High-performance JSON parser with streaming support and minimal memory footprint. Ideal for processing large JSON files.",
+  "license": "Apache-2.0",
+  "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+  "keywords": [
+    "json",
+    "parser",
+    "streaming"
+  ],
+  "tags": [
+    "json",
+    "parser"
+  ],
+  "homepage": "https://example.com/json-parser",
+  "issue_tracker": "https://github.com/jsondev/json-parser/issues",
+  "git": "https://github.com/jsondev/json-parser.git",
+  "installer": "setup.py",
+  "dependencies": [
+    "make@latest"
+  ]
+}

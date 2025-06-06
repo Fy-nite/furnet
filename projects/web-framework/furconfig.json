@@ -1,0 +1,34 @@
+{
+  "name": "web-framework",
+  "version": "2.1.0",
+  "authors": [
+    "devuser1",
+    "contributor2"
+  ],
+  "Supported_Platforms": [
+    "linux",
+    "macos",
+    "windows"
+  ],
+  "description": "Lightweight web framework",
+  "long_description": "A comprehensive web framework designed for modern applications with built-in routing, middleware support, and templating.",
+  "license": "MIT",
+  "license_url": "https://opensource.org/license/mit/",
+  "keywords": [
+    "web",
+    "framework",
+    "http"
+  ],
+  "tags": [
+    "web",
+    "framework"
+  ],
+  "homepage": "https://example.com/web-framework",
+  "issue_tracker": "https://github.com/devuser1/web-framework/issues",
+  "git": "https://github.com/devuser1/web-framework.git",
+  "installer": "install.sh",
+  "dependencies": [
+    "make@latest",
+    "gcc@9.0.0"
+  ]
+}

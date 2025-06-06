@@ -1,0 +1,33 @@
+{
+  "name": "crypto-utils",
+  "version": "3.0.1",
+  "authors": [
+    "securedev",
+    "cryptoexpert"
+  ],
+  "Supported_Platforms": [
+    "linux",
+    "windows"
+  ],
+  "description": "Cryptographic utilities",
+  "long_description": "Secure cryptographic library providing encryption, hashing, and digital signature capabilities with modern algorithms.",
+  "license": "BSD-3-Clause",
+  "license_url": "https://opensource.org/licenses/BSD-3-Clause",
+  "keywords": [
+    "crypto",
+    "encryption",
+    "security"
+  ],
+  "tags": [
+    "crypto",
+    "security"
+  ],
+  "homepage": "https://example.com/crypto-utils",
+  "issue_tracker": "https://gitlab.com/securedev/crypto-utils/issues",
+  "git": "https://gitlab.com/securedev/crypto-utils.git",
+  "installer": "configure.sh",
+  "dependencies": [
+    "openssl@1.1.1",
+    "make@latest"
+  ]
+}
