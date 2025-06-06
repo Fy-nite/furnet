@@ -1,0 +1,157 @@
+@page "/Packages/Details/{packageName}"
+@model furnet.Pages.Packages.DetailsModel
+@{
+    ViewData["Title"] = $"{Model.Package?.Name ?? "Package"} - Package Details";
+}
+
+@if (!Model.IsApiAvailable)
+{
+    <div class="alert alert-warning" role="alert">
+        <i class="bi bi-exclamation-triangle"></i>
+        API is currently unavailable. Showing cached/demo data.
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-circle"></i>
+        @Model.ErrorMessage
+    </div>
+}
+
+@if (Model.Package != null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center mb-3">
+                <h1 class="me-3">@Model.Package.Name</h1>
+                <span class="badge bg-primary fs-6">v@Model.Package.Version</span>
+            </div>
+            
+            <p class="lead">@Model.Package.Description</p>
+            
+            <div class="mb-4">
+                <h5>Authors</h5>
+                <div>
+                    @foreach (var author in Model.Package.Authors)
+                    {
+                        <span class="badge bg-secondary me-1">@author</span>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Package.Tags.Any())
+            {
+                <div class="mb-4">
+                    <h5>Tags</h5>
+                    <div>
+                        @foreach (var tag in Model.Package.Tags)
+                        {
+                            <span class="badge bg-light text-dark me-1">#@tag</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (Model.Package.Dependencies.Any())
+            {
+                <div class="mb-4">
+                    <h5>Dependencies</h5>
+                    <ul class="list-group">
+                        @foreach (var dependency in Model.Package.Dependencies)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <code>@dependency</code>
+                                <span class="badge bg-info">Required</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (Model.FurConfig != null)
+            {
+                <div class="mb-4">
+                    <h5>furconfig.json</h5>
+                    <pre class="bg-light p-3 rounded"><code>@System.Text.Json.JsonSerializer.Serialize(Model.FurConfig, new System.Text.Json.JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower })</code></pre>
+                </div>
+            }
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Package Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Version:</dt>
+                        <dd class="col-sm-8">@Model.Package.Version</dd>
+                        
+                        <dt class="col-sm-4">Downloads:</dt>
+                        <dd class="col-sm-8">@Model.Package.Downloads.ToString("N0")</dd>
+                        
+                        <dt class="col-sm-4">Updated:</dt>
+                        <dd class="col-sm-8">@Model.Package.LastUpdated.ToString("MMM dd, yyyy")</dd>
+                        
+                        @if (!string.IsNullOrEmpty(Model.Package.Installer))
+                        {
+                            <dt class="col-sm-4">Installer:</dt>
+                            <dd class="col-sm-8"><code>@Model.Package.Installer</code></dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Installation</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">Install this package using FUR:</p>
+                    <div class="bg-dark text-light p-2 rounded">
+                        <code class="text-dark">@Model.Package.InstallCommand</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Links</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Package.Homepage))
+                    {
+                        <a href="@Model.Package.Homepage" target="_blank" class="btn btn-outline-primary btn-sm me-2 mb-2">
+                            <i class="bi bi-house"></i> Homepage
+                        </a>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.Package.IssueTracker))
+                    {
+                        <a href="@Model.Package.IssueTracker" target="_blank" class="btn btn-outline-secondary btn-sm me-2 mb-2">
+                            <i class="bi bi-bug"></i> Issues
+                        </a>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.Package.Git))
+                    {
+                        <a href="@Model.Package.Git" target="_blank" class="btn btn-outline-dark btn-sm me-2 mb-2">
+                            <i class="bi bi-git"></i> Repository
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="bi bi-exclamation-triangle display-1 text-muted"></i>
+        <h3 class="mt-3">Package Not Found</h3>
+        <p class="text-muted">The requested package could not be found.</p>
+        <a href="/Packages/Browse" class="btn btn-primary">Browse All Packages</a>
+    </div>
+}
