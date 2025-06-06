@@ -1,0 +1,293 @@
+:root {
+  /* Light theme variables */
+  --bg-color: #ffffff;
+  --text-color: #212529;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --navbar-bg: #ffffff;
+  --hero-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --primary-color: #667eea;
+  --primary-hover: #5a6fd8;
+  --code-bg: #f8f9fa;
+  --muted-text: #6c757d;
+  --footer-bg: #ffffff;
+  --shadow-color: rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] {
+  /* Dark theme variables */
+  --bg-color: #1a1a1a;
+  --text-color: #e9ecef;
+  --card-bg: #2d2d2d;
+  --border-color: #404040;
+  --navbar-bg: #212529;
+  --hero-gradient: linear-gradient(135deg, #4a5568 0%, #553c7a 100%);
+  --primary-color: #8b9cf5;
+  --primary-hover: #7c8ef0;
+  --code-bg: #343a40;
+  --muted-text: #adb5bd;
+  --footer-bg: #212529;
+  --shadow-color: rgba(0,0,0,0.3);
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin-bottom: 60px;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Dark mode specific overrides */
+[data-theme="dark"] .navbar-light {
+  background-color: var(--navbar-bg) !important;
+}
+
+[data-theme="dark"] .navbar-light .navbar-brand,
+[data-theme="dark"] .navbar-light .nav-link {
+  color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .navbar-light .navbar-toggler {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .border-bottom {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .footer {
+  background-color: var(--footer-bg);
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+  color: var(--muted-text) !important;
+}
+
+/* AUR-like styling */
+.hero-section {
+    background: var(--hero-gradient);
+    color: white;
+    margin: -1rem -15px 0 -15px;
+}
+
+.hero-section .btn-outline-primary {
+    border-color: white;
+    color: white;
+}
+
+.hero-section .btn-outline-primary:hover {
+    background-color: white;
+    color: var(--primary-color);
+}
+
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.card-header {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.package-card {
+    height: 100%;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+code {
+    background-color: var(--code-bg);
+    color: var(--text-color);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* Pre and code block styling */
+pre {
+    background-color: var(--code-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+/* JSON display styling */
+.json-display {
+    background-color: var(--code-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+/* Dependencies and package info styling */
+.package-dependencies,
+.package-info-section {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.package-dependencies .list-group-item,
+.package-info-section .list-group-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Dark mode specific overrides for code and dependencies */
+[data-theme="dark"] pre,
+[data-theme="dark"] code,
+[data-theme="dark"] .json-display {
+    background-color: var(--code-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .package-dependencies,
+[data-theme="dark"] .package-info-section,
+[data-theme="dark"] .list-group-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Alert styling for dark mode */
+[data-theme="dark"] .alert {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(139, 156, 245, 0.1);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border-color: #ffc107;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: #dc3545;
+    color: var(--text-color);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.form-control {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+/* Dark mode toggle button */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background-color: var(--card-bg);
+    transform: scale(1.05);
+}
+
+/* List styling for dark mode */
+[data-theme="dark"] .list-unstyled li {
+    color: var(--text-color);
+}
+
+/* Link styling for dark mode */
+[data-theme="dark"] a {
+    color: var(--primary-color);
+}
+
+[data-theme="dark"] a:hover {
+    color: var(--primary-hover);
+}
