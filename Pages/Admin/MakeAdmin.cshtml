@@ -1,0 +1,33 @@
+@page
+@model furnet.Pages.Admin.MakeAdminModel
+@{
+    ViewData["Title"] = "Make Admin";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Admin Setup</h5>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(Model.Message))
+                    {
+                        <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")" role="alert">
+                            @Model.Message
+                        </div>
+                    }
+                    
+                    <p>Click the button below to make yourself an admin (first user only):</p>
+                    
+                    <form method="post">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-person-check"></i> Make Me Admin
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

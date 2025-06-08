@@ -66,3 +66,44 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Project: FUR (Finite User Repository)
 - Website: [https://github.com/fy-nite/furnet](https://github.com/fy-nite/furnet)
 - Issues: Please report issues through our issue tracker
+
+# FurNet
+
+## Setup
+
+1. Copy `.env.example` to `.env`
+2. Update the GitHub OAuth credentials in `.env`:
+   - Go to https://github.com/settings/applications/new
+   - Create a new OAuth app
+   - Set Application name: `FurNet Testing`
+   - Set Homepage URL: `http://testing.finite.ovh:8080`
+   - Set Authorization callback URL: `http://testing.finite.ovh:8080/signin-github`
+   - Copy Client ID and Client Secret to your `.env` file
+
+## Environment Variables
+
+The application uses the following environment variables:
+
+- `GITHUB_CLIENT_ID`: GitHub OAuth Client ID
+- `GITHUB_CLIENT_SECRET`: GitHub OAuth Client Secret  
+- `CONNECTION_STRING`: Database connection string (optional)
+- `ASPNETCORE_ENVIRONMENT`: Application environment (Development/Production)
+
+## Running the Application
+
+```bash
+dotnet restore
+dotnet watch run --urls="http://192.168.0.145:8080"
+```
+
+For testing mode:
+```bash
+dotnet watch run --urls="http://192.168.0.145:8080" -- --test
+```
+
+## OAuth Setup Notes
+
+When setting up GitHub OAuth for testing with subdomain:
+- Homepage URL: `http://testing.finite.ovh:8080`
+- Authorization callback URL: `http://testing.finite.ovh:8080/signin-github`
+- Make sure your DNS/proxy is correctly forwarding `testing.finite.ovh:8080` to `192.168.0.145:8080`

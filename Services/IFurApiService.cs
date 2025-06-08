@@ -11,5 +11,6 @@ namespace furnet.Services
         Task<List<Package>> GetPackageDetailsAsync(string? sort = null, string? search = null);
         void ClearCache();
         bool IsApiAvailable { get; }
+        bool UseLocalStorage { get; }
     }
 }

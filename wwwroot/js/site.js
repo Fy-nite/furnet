@@ -5,6 +5,12 @@
 
 // Theme management
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're in testing mode (passed from server)
+    const isTestingMode = document.body.getAttribute('data-testing-mode') === 'true';
+    if (isTestingMode) {
+        console.log('🧪 FurNet is running in testing mode');
+    }
+    
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const htmlElement = document.documentElement;
@@ -16,10 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function applyTheme(theme) {
         if (theme === 'dark') {
             htmlElement.setAttribute('data-theme', 'dark');
-            themeIcon.className = 'bi bi-sun';
+            if (themeIcon) themeIcon.className = 'bi bi-sun';
         } else {
             htmlElement.removeAttribute('data-theme');
-            themeIcon.className = 'bi bi-moon';
+            if (themeIcon) themeIcon.className = 'bi bi-moon';
         }
     }
     
@@ -27,13 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
     applyTheme(savedTheme);
     
     // Toggle theme
-    themeToggle.addEventListener('click', function() {
-        const currentTheme = htmlElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        applyTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
     
     // Listen for system theme changes
     if (window.matchMedia) {
@@ -73,4 +81,19 @@ document.addEventListener('DOMContentLoaded', function() {
     window.clearPackageCache = clearPackageCache;
 });
 
-// Existing site.js code (if any) would go here
+// Simple logout cleanup function
+function handleLogout() {
+    // Clear local storage as a courtesy, but don't be aggressive about it
+    try {
+        localStorage.removeItem('theme'); // Keep theme preference
+        sessionStorage.clear();
+        console.log('Logout: Cleared session storage');
+    } catch (e) {
+        console.log('Logout: Could not clear storage:', e);
+    }
+    
+    return true; // Allow form submission to proceed
+}
+
+// Make handleLogout available globally
+window.handleLogout = handleLogout;

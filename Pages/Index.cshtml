@@ -4,6 +4,14 @@
     ViewData["Title"] = "Home";
 }
 
+@if (ViewData["IsTestingMode"] as bool? == true)
+{
+    <div class="alert alert-info" role="alert">
+        <i class="bi bi-info-circle"></i>
+        <strong>Development Mode:</strong> Running in testing/debug mode with enhanced logging and demo data.
+    </div>
+}
+
 <div class="hero-section text-center py-5 mb-5">
     <div class="container">
         <h1 class="display-3 fw-bold mb-3">

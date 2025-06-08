@@ -291,3 +291,31 @@ pre code {
 [data-theme="dark"] a:hover {
     color: var(--primary-hover);
 }
+
+/* About page specific styling */
+.about-feature-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.about-feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.contact-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(var(--primary-color), 0.05) 100%);
+}
+
+.community-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.community-links a:hover {
+    color: var(--primary-color);
+}
+
+/* Dark mode enhancements for about page */
+[data-theme="dark"] .contact-card {
+    background: linear-gradient(135deg, var(--card-bg) 0%, rgba(139, 156, 245, 0.1) 100%);
+}

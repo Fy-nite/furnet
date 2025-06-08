@@ -1,0 +1,221 @@
+@page
+@model furnet.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Admin Panel";
+    Layout = "_Layout";
+}
+
+@if (ViewData["IsTestingMode"] as bool? == true)
+{
+    <div class="alert alert-warning" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> 
+        You are currently in testing mode. All changes are temporary.
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")" role="alert">
+        @Model.Message
+    </div>
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1><i class="bi bi-gear"></i> Admin Panel</h1>
+            <p class="text-muted">Manage packages, users, and system settings</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    @if (Model.Statistics != null)
+    {
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>@Model.Statistics.TotalPackages</h4>
+                                <p class="mb-0">Total Packages</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-box-seam fs-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>@Model.Statistics.ActivePackages</h4>
+                                <p class="mb-0">Active Packages</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-check-circle fs-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>@Model.Statistics.TotalDownloads</h4>
+                                <p class="mb-0">Total Downloads</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-download fs-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>@Model.AllUsers.Count</h4>
+                                <p class="mb-0">Total Users</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="bi bi-people fs-2"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <!-- User Management -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-people"></i> User Management</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Admin</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model.AllUsers)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@user.AvatarUrl" alt="@user.Username" class="rounded-circle me-2" style="width: 32px; height: 32px;">
+                                                <div>
+                                                    <strong>@user.Username</strong><br>
+                                                    <small class="text-muted">@user.Email</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @if (user.IsAdmin)
+                                            {
+                                                <span class="badge bg-success">Admin</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">User</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!user.IsAdmin)
+                                            {
+                                                <form method="post" asp-page-handler="PromoteUser" class="d-inline">
+                                                    <input type="hidden" name="userId" value="@user.Id" />
+                                                    <button type="submit" class="btn btn-success btn-sm" 
+                                                            onclick="return confirm('Are you sure you want to promote @user.Username to admin?')">
+                                                        <i class="bi bi-arrow-up"></i> Promote
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page-handler="RevokeAdmin" class="d-inline">
+                                                    <input type="hidden" name="userId" value="@user.Id" />
+                                                    <button type="submit" class="btn btn-warning btn-sm"
+                                                            onclick="return confirm('Are you sure you want to revoke admin privileges from @user.Username?')"
+                                                            @(User.FindFirst("UserId")?.Value == user.Id.ToString() ? "disabled" : "")>
+                                                        <i class="bi bi-arrow-down"></i> Revoke
+                                                    </button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Package Management -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-box-seam"></i> Recent Packages</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Status</th>
+                                    <th>Downloads</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var package in Model.Packages.Take(10))
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@package.Name</strong><br>
+                                            <small class="text-muted">v @package.Version</small>
+                                        </td>
+                                        <td>
+                                            @if (package.IsActive)
+                                            {
+                                                <span class="badge bg-success">Active</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Inactive</span>
+                                            }
+                                        </td>
+                                        <td>@package.Downloads.ToString("N0")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="/Packages" class="btn btn-primary">View All Packages</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add any admin-specific JavaScript here
+</script>

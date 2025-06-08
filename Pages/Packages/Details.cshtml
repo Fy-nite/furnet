@@ -2,14 +2,86 @@
 @model furnet.Pages.Packages.DetailsModel
 @{
     ViewData["Title"] = $"{Model.Package?.Name ?? "Package"} - Package Details";
+    
+    // Set meta tags for social sharing if package exists
+    if (Model.Package != null)
+    {
+        ViewData["MetaTitle"] = $"{Model.Package.Name} v{Model.Package.Version}";
+        ViewData["MetaDescription"] = !string.IsNullOrEmpty(Model.Package.Description) 
+            ? Model.Package.Description 
+            : $"Install {Model.Package.Name} using FUR package manager";
+        ViewData["MetaImage"] = $"{Request.Scheme}://{Request.Host}/images/package-preview.png";
+        ViewData["MetaUrl"] = $"{Request.Scheme}://{Request.Host}/Packages/Details/{Model.Package.Name}";
+        ViewData["MetaKeywords"] = string.Join(", ", Model.Package.Keywords);
+        ViewData["MetaAuthors"] = string.Join(", ", Model.Package.Authors);
+        ViewData["MetaPackageName"] = Model.Package.Name;
+        ViewData["MetaPackageVersion"] = Model.Package.Version;
+        ViewData["MetaDownloads"] = Model.Package.Downloads.ToString("N0");
+        ViewData["MetaLastUpdated"] = Model.Package.LastUpdated.ToString("yyyy-MM-dd");
+    }
 }
 
-@if (!Model.IsApiAvailable)
-{
-    <div class="alert alert-warning" role="alert">
-        <i class="bi bi-exclamation-triangle"></i>
-        API is currently unavailable. Showing cached/demo data.
-    </div>
+@section Head {
+    @if (Model.Package != null)
+    {
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="@ViewData["MetaTitle"]" />
+        <meta property="og:description" content="@ViewData["MetaDescription"]" />
+        <meta property="og:url" content="@ViewData["MetaUrl"]" />
+        <meta property="og:image" content="@ViewData["MetaImage"]" />
+        <meta property="og:site_name" content="FurNet - Finite User Repository" />
+        
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="@ViewData["MetaTitle"]" />
+        <meta name="twitter:description" content="@ViewData["MetaDescription"]" />
+        <meta name="twitter:image" content="@ViewData["MetaImage"]" />
+        
+        <!-- Package-specific meta tags -->
+        <meta name="package:name" content="@ViewData["MetaPackageName"]" />
+        <meta name="package:version" content="@ViewData["MetaPackageVersion"]" />
+        <meta name="package:authors" content="@ViewData["MetaAuthors"]" />
+        <meta name="package:downloads" content="@ViewData["MetaDownloads"]" />
+        <meta name="package:last_updated" content="@ViewData["MetaLastUpdated"]" />
+        <meta name="package:install_command" content="fur install @Model.Package.Name" />
+        
+        <!-- Standard meta tags -->
+        <meta name="description" content="@ViewData["MetaDescription"]" />
+        <meta name="keywords" content="@ViewData["MetaKeywords"], fur, package manager, @ViewData["MetaPackageName"]" />
+        <meta name="author" content="@ViewData["MetaAuthors"]" />
+        
+        <!-- Rich snippets / JSON-LD -->
+        <script type="application/ld+json">
+        {
+            "@@context": "https://schema.org",
+            "@@type": "SoftwareApplication",
+            "name": "@Model.Package.Name",
+            "version": "@Model.Package.Version",
+            "description": "@Model.Package.Description",
+            "author": [@foreach(var author in Model.Package.Authors) { <text>"@author"@(Model.Package.Authors.Last() != author ? "," : "")</text> }],
+            "url": "@ViewData["MetaUrl"]",
+            "downloadUrl": "@Model.Package.Git",
+            "operatingSystem": "@string.Join(", ", Model.Package.SupportedPlatforms)",
+            "applicationCategory": "DeveloperApplication",
+            "offers": {
+                "@@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "aggregateRating": {
+                "@@type": "AggregateRating",
+                "ratingValue": "@Model.Package.Rating",
+                "ratingCount": "@Model.Package.RatingCount"
+            },
+            "interactionStatistic": {
+                "@@type": "InteractionCounter",
+                "interactionType": "https://schema.org/DownloadAction",
+                "userInteractionCount": "@Model.Package.Downloads"
+            }
+        }
+        </script>
+    }
 }
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
@@ -22,14 +94,79 @@
 
 @if (Model.Package != null)
 {
+    <!-- Discord-style embed preview (visible when debugging) -->
+    @if (Request.Query.ContainsKey("preview"))
+    {
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="bi bi-discord"></i> Social Media Preview</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5 class="fw-bold">@ViewData["MetaTitle"]</h5>
+                        <p class="text-muted">@ViewData["MetaDescription"]</p>
+                        <small class="text-muted">
+                            <i class="bi bi-download"></i> @ViewData["MetaDownloads"] downloads •
+                            <i class="bi bi-calendar"></i> Updated @ViewData["MetaLastUpdated"]
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="bg-light p-3 rounded">
+                            <i class="bi bi-box-seam display-4 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <div class="row">
         <div class="col-md-8">
             <div class="d-flex align-items-center mb-3">
                 <h1 class="me-3">@Model.Package.Name</h1>
-                <span class="badge bg-primary fs-6">v@Model.Package.Version</span>
+                <span class="badge bg-primary fs-6">v @Model.Package.Version</span>
+                @if (Request.Query.ContainsKey("preview"))
+                {
+                    <a href="?preview" class="btn btn-sm btn-outline-secondary ms-2" title="Toggle preview">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                }
+                
+                @* Add edit button for package owners *@
+                @{
+                    var userIdClaim = User.FindFirst("UserId");
+                    var isAdmin = User.HasClaim("IsAdmin", "True");
+                    var canEdit = isAdmin || (User.Identity?.IsAuthenticated == true && userIdClaim != null && 
+                                 Model.Package.OwnerId != null && int.TryParse(userIdClaim.Value, out var userId) && 
+                                 userId == Model.Package.OwnerId);
+                }
+                
+                @if (canEdit)
+                {
+                    <a href="/Packages/Edit/@Model.Package.Name" class="btn btn-outline-primary btn-sm ms-2">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                }
             </div>
             
             <p class="lead">@Model.Package.Description</p>
+            
+            <!-- Add share buttons -->
+            <div class="mb-4">
+                <h6>Share this package:</h6>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="sharePackage('twitter')">
+                        <i class="bi bi-twitter"></i> Twitter
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="sharePackage('copy')">
+                        <i class="bi bi-clipboard"></i> Copy Link
+                    </button>
+                    <a href="?preview" class="btn btn-outline-info">
+                        <i class="bi bi-eye"></i> Preview
+                    </a>
+                </div>
+            </div>
             
             <div class="mb-4">
                 <h5>Authors</h5>
@@ -41,16 +178,26 @@
                 </div>
             </div>
 
-            @if (Model.Package.Tags.Any())
+            @if (Model.Package.Keywords.Any())
             {
                 <div class="mb-4">
-                    <h5>Tags</h5>
+                    <h5>Keywords</h5>
                     <div>
-                        @foreach (var tag in Model.Package.Tags)
+                        @foreach (var keyword in Model.Package.Keywords)
                         {
-                            <span class="badge bg-light text-dark me-1">#@tag</span>
+                            <span class="badge bg-light text-dark me-1">@keyword</span>
                         }
                     </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Package.ReadmeUrl))
+            {
+                <div class="mb-4">
+                    <h5>Documentation</h5>
+                    <a href="@Model.Package.ReadmeUrl" target="_blank" class="btn btn-outline-primary">
+                        <i class="bi bi-file-text"></i> View README
+                    </a>
                 </div>
             }
 
@@ -70,13 +217,6 @@
                 </div>
             }
 
-            @if (Model.FurConfig != null)
-            {
-                <div class="mb-4">
-                    <h5>furconfig.json</h5>
-                    <pre class="bg-light p-3 rounded"><code>@System.Text.Json.JsonSerializer.Serialize(Model.FurConfig, new System.Text.Json.JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower })</code></pre>
-                </div>
-            }
         </div>
         
         <div class="col-md-4">
@@ -110,7 +250,7 @@
                 </div>
                 <div class="card-body">
                     <p class="mb-2">Install this package using FUR:</p>
-                    <div class="bg-dark text-light p-2 rounded">
+                    <div class="bg-dark text-dark p-2 rounded">
                         <code class="text-dark">@Model.Package.InstallCommand</code>
                     </div>
                 </div>
@@ -141,6 +281,13 @@
                             <i class="bi bi-git"></i> Repository
                         </a>
                     }
+
+                    @if (!string.IsNullOrEmpty(Model.Package.ReadmeUrl))
+                    {
+                        <a href="@Model.Package.ReadmeUrl" target="_blank" class="btn btn-outline-info btn-sm me-2 mb-2">
+                            <i class="bi bi-file-text"></i> README
+                        </a>
+                    }
                 </div>
             </div>
         </div>
@@ -154,4 +301,29 @@ else
         <p class="text-muted">The requested package could not be found.</p>
         <a href="/Packages/Browse" class="btn btn-primary">Browse All Packages</a>
     </div>
+}
+
+@section Scripts {
+    <script>
+        function sharePackage(platform) {
+            const url = window.location.href;
+            const title = '@ViewData["MetaTitle"]';
+            const description = '@ViewData["MetaDescription"]';
+            
+            switch(platform) {
+                case 'twitter':
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title + ' - ' + description)}&url=${encodeURIComponent(url)}`, '_blank');
+                    break;
+                case 'copy':
+                    navigator.clipboard.writeText(url).then(() => {
+                        // Simple feedback
+                        const btn = event.target.closest('button');
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                        setTimeout(() => btn.innerHTML = originalText, 2000);
+                    });
+                    break;
+            }
+        }
+    </script>
 }
