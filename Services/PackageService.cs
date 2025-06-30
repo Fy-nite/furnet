@@ -59,18 +59,18 @@ namespace furnet.Services
                 {
                     Name = furConfig.Name,
                     Version = furConfig.Version,
-                    Authors = furConfig.Authors,
-                    SupportedPlatforms = furConfig.SupportedPlatforms,
-                    Description = furConfig.Description,
-                    ReadmeUrl = furConfig.ReadmeUrl,
-                    License = furConfig.License,
-                    LicenseUrl = furConfig.LicenseUrl,
-                    Keywords = furConfig.Keywords,
-                    Homepage = furConfig.Homepage,
-                    IssueTracker = furConfig.IssueTracker,
+                    Authors = furConfig.Authors ?? new List<string>(),
+                    SupportedPlatforms = furConfig.SupportedPlatforms ?? new List<string>(),
+                    Description = furConfig.Description ?? string.Empty,
+                    ReadmeUrl = furConfig.ReadmeUrl ?? string.Empty,
+                    License = furConfig.License ?? string.Empty,
+                    LicenseUrl = furConfig.LicenseUrl ?? string.Empty,
+                    Keywords = furConfig.Keywords ?? new List<string>(),
+                    Homepage = furConfig.Homepage ?? string.Empty,
+                    IssueTracker = furConfig.IssueTracker ?? string.Empty,
                     Git = furConfig.Git,
-                    Installer = furConfig.Installer,
-                    Dependencies = furConfig.Dependencies,
+                    Installer = furConfig.Installer ?? string.Empty,
+                    Dependencies = furConfig.Dependencies ?? new List<string>(),
                     InstallCommand = $"fur install {furConfig.Name}",
                     Downloads = 0,
                     ViewCount = 0,
@@ -113,18 +113,18 @@ namespace furnet.Services
                 }
 
                 package.Version = furConfig.Version;
-                package.Authors = furConfig.Authors;
-                package.SupportedPlatforms = furConfig.SupportedPlatforms;
-                package.Description = furConfig.Description;
-                package.ReadmeUrl = furConfig.ReadmeUrl;
-                package.License = furConfig.License;
-                package.LicenseUrl = furConfig.LicenseUrl;
-                package.Keywords = furConfig.Keywords;
-                package.Homepage = furConfig.Homepage;
-                package.IssueTracker = furConfig.IssueTracker;
+                package.Authors = furConfig.Authors ?? new List<string>();
+                package.SupportedPlatforms = furConfig.SupportedPlatforms ?? new List<string>();
+                package.Description = furConfig.Description ?? string.Empty;
+                package.ReadmeUrl = furConfig.ReadmeUrl ?? string.Empty;
+                package.License = furConfig.License ?? string.Empty;
+                package.LicenseUrl = furConfig.LicenseUrl ?? string.Empty;
+                package.Keywords = furConfig.Keywords ?? new List<string>();
+                package.Homepage = furConfig.Homepage ?? string.Empty;
+                package.IssueTracker = furConfig.IssueTracker ?? string.Empty;
                 package.Git = furConfig.Git;
-                package.Installer = furConfig.Installer;
-                package.Dependencies = furConfig.Dependencies;
+                package.Installer = furConfig.Installer ?? string.Empty;
+                package.Dependencies = furConfig.Dependencies ?? new List<string>();
                 package.LastUpdated = DateTime.UtcNow;
                 package.UpdatedBy = updatedBy;
 
@@ -184,37 +184,44 @@ namespace furnet.Services
         {
             var queryable = _context.Packages.Where(p => p.IsActive);
 
-            // Apply search filter
+            List<Package> filteredPackages;
+
+            // Apply search filter (client-side for case-insensitive search)
             if (!string.IsNullOrEmpty(query))
             {
-                var searchTerm = query.ToLower();
-                queryable = queryable.Where(p =>
-                    p.Name.ToLower().Contains(searchTerm) ||
-                    p.Description.ToLower().Contains(searchTerm) ||
-                    p.Authors.Any(a => a.ToLower().Contains(searchTerm)) ||
-                    p.Keywords.Any(k => k.ToLower().Contains(searchTerm))
-                );
+                var searchTerm = query;
+                filteredPackages = await queryable.ToListAsync();
+                filteredPackages = filteredPackages.Where(p =>
+                    (!string.IsNullOrEmpty(p.Name) && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (!string.IsNullOrEmpty(p.Description) && p.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (p.Authors != null && p.Authors.Any(a => !string.IsNullOrEmpty(a) && a.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))) ||
+                    (p.Keywords != null && p.Keywords.Any(k => !string.IsNullOrEmpty(k) && k.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+                ).ToList();
+            }
+            else
+            {
+                filteredPackages = await queryable.ToListAsync();
             }
 
-            // Apply sorting
-            queryable = sort?.ToLower() switch
+            // Apply sorting (client-side)
+            IEnumerable<Package> sortedPackages = sort?.ToLower() switch
             {
-                "mostdownloads" => queryable.OrderByDescending(p => p.Downloads),
-                "leastdownloads" => queryable.OrderBy(p => p.Downloads),
-                "recentlyupdated" => queryable.OrderByDescending(p => p.LastUpdated),
-                "recentlyuploaded" => queryable.OrderByDescending(p => p.CreatedAt),
-                "oldestupdated" => queryable.OrderBy(p => p.LastUpdated),
-                "oldestuploaded" => queryable.OrderBy(p => p.CreatedAt),
-                "mostviewed" => queryable.OrderByDescending(p => p.ViewCount),
-                "toprated" => queryable.OrderByDescending(p => p.Rating),
-                _ => queryable.OrderBy(p => p.Name)
+                "mostdownloads" => filteredPackages.OrderByDescending(p => p.Downloads),
+                "leastdownloads" => filteredPackages.OrderBy(p => p.Downloads),
+                "recentlyupdated" => filteredPackages.OrderByDescending(p => p.LastUpdated),
+                "recentlyuploaded" => filteredPackages.OrderByDescending(p => p.CreatedAt),
+                "oldestupdated" => filteredPackages.OrderBy(p => p.LastUpdated),
+                "oldestuploaded" => filteredPackages.OrderBy(p => p.CreatedAt),
+                "mostviewed" => filteredPackages.OrderByDescending(p => p.ViewCount),
+                "toprated" => filteredPackages.OrderByDescending(p => p.Rating),
+                _ => filteredPackages.OrderBy(p => p.Name)
             };
 
-            var totalCount = await queryable.CountAsync();
-            var packages = await queryable
+            var totalCount = sortedPackages.Count();
+            var packages = sortedPackages
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToList();
 
             return new SearchResult
             {

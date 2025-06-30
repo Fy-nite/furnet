@@ -78,8 +78,32 @@ builder.Services.AddAuthentication(options =>
     options.Events.OnSigningOut = async context =>
     {
         // Clear session during sign out
-        context.HttpContext.Session.Clear();
-        Console.WriteLine("Cookie authentication sign out completed");
+        if (context.HttpContext.Session.IsAvailable)
+        {
+            context.HttpContext.Session.Clear();
+        }
+        
+        // Force clear all auth cookies
+        var cookiesToClear = new[] 
+        {
+            ".AspNetCore.FurNet.Auth.",
+            ".AspNetCore.FurNet.Correlation.",
+            ".AspNetCore.Antiforgery.",
+            ".AspNetCore.Session."
+        };
+        
+        foreach (var cookieName in cookiesToClear)
+        {
+            context.Response.Cookies.Delete(cookieName, new CookieOptions
+            {
+                Path = "/",
+                HttpOnly = true,
+                Secure = context.HttpContext.Request.IsHttps,
+                SameSite = SameSiteMode.Lax
+            });
+        }
+        
+        Console.WriteLine($"Cookie authentication sign out completed for user: {context.HttpContext.User?.Identity?.Name}");
     };
 })
 .AddOAuth("GitHub", options =>
@@ -93,6 +117,7 @@ builder.Services.AddAuthentication(options =>
     options.CorrelationCookie.SameSite = SameSiteMode.Lax;
     options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.CorrelationCookie.HttpOnly = true;
+    options.CorrelationCookie.Expiration = TimeSpan.FromMinutes(5); // Short expiration
     
     options.AuthorizationEndpoint = "https://github.com/login/oauth/authorize";
     options.TokenEndpoint = "https://github.com/login/oauth/access_token";

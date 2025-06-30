@@ -28,16 +28,39 @@ namespace furnet.Pages.Account
         {
             try
             {
-                var userName = User.Identity?.Name ?? "unknown";
+                var userName = User.Identity?.Name ?? "anonymous";
                 _logger.LogInformation("Starting logout for user: {UserName}", userName);
                 
                 // Clear session first
-                HttpContext.Session.Clear();
+                if (HttpContext.Session.IsAvailable)
+                {
+                    HttpContext.Session.Clear();
+                }
                 
-                // Sign out from cookie authentication
+                // Sign out from cookie authentication scheme
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 
-                // Set headers to prevent caching
+                // Delete authentication cookies explicitly
+                var cookiesToDelete = new[]
+                {
+                    ".AspNetCore.FurNet.Auth",
+                    ".AspNetCore.FurNet.Correlation", 
+                    ".AspNetCore.Antiforgery",
+                    ".AspNetCore.Session"
+                };
+
+                foreach (var cookieName in cookiesToDelete)
+                {
+                    Response.Cookies.Delete(cookieName, new CookieOptions
+                    {
+                        Path = "/",
+                        HttpOnly = true,
+                        Secure = Request.IsHttps,
+                        SameSite = SameSiteMode.Lax
+                    });
+                }
+                
+                // Set cache control headers
                 Response.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
                 Response.Headers.Add("Pragma", "no-cache");
                 Response.Headers.Add("Expires", "0");

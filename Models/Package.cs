@@ -28,22 +28,18 @@ namespace furnet.Models
         
         public List<string> Keywords { get; set; } = new();
         
-        [Required]
         public string Homepage { get; set; } = string.Empty;
         
-        [Required]
         public string IssueTracker { get; set; } = string.Empty;
         
         [Required]
         public string Git { get; set; } = string.Empty;
         
-        [Required]
         public string Installer { get; set; } = string.Empty;
         
         [Required]
         public string InstallCommand { get; set; } = string.Empty;
         
-        [Required]
         public List<string> Dependencies { get; set; } = new();
         
         // Additional metadata for the website

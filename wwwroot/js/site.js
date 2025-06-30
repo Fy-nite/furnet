@@ -1,7 +1,7 @@
 ﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
-// Write your JavaScript code.
+
 
 // Theme management
 document.addEventListener('DOMContentLoaded', function() {
@@ -9,6 +9,46 @@ document.addEventListener('DOMContentLoaded', function() {
     const isTestingMode = document.body.getAttribute('data-testing-mode') === 'true';
     if (isTestingMode) {
         console.log('🧪 FurNet is running in testing mode');
+    }
+    
+    // Check for logout completion and force cleanup
+    const urlParams = new URLSearchParams(window.location.search);
+    const logoutStatus = urlParams.get('logout');
+    
+    if (logoutStatus === 'complete' || logoutStatus === 'error') {
+        console.log('🚪 Logout detected - performing complete cleanup');
+        
+        // Clear ALL storage
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear all cookies via JavaScript
+            document.cookie.split(";").forEach(function(c) { 
+                const eqPos = c.indexOf("=");
+                const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+                if (window.location.hostname.includes('.')) {
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=." + window.location.hostname.split('.').slice(-2).join('.');
+                }
+            });
+            
+            console.log('🚪 Storage and cookies cleared');
+        } catch (e) {
+            console.error('Error clearing storage:', e);
+        }
+        
+        // Remove logout parameter from URL
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+        
+        // Force reload to ensure clean state
+        setTimeout(() => {
+            window.location.reload(true);
+        }, 500);
+        
+        return; // Don't continue with other initialization
     }
     
     const themeToggle = document.getElementById('themeToggle');
@@ -83,13 +123,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Simple logout cleanup function
 function handleLogout() {
-    // Clear local storage as a courtesy, but don't be aggressive about it
+    console.log('🚪 Logout initiated - clearing storage');
+    
     try {
-        localStorage.removeItem('theme'); // Keep theme preference
+        // Clear all client-side storage
+        localStorage.clear();
         sessionStorage.clear();
-        console.log('Logout: Cleared session storage');
+        
+        // Clear all cookies via JavaScript
+        document.cookie.split(";").forEach(function(c) { 
+            const eqPos = c.indexOf("=");
+            const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        });
+        
+        console.log('🚪 Client-side cleanup completed');
     } catch (e) {
-        console.log('Logout: Could not clear storage:', e);
+        console.error('Error during logout cleanup:', e);
     }
     
     return true; // Allow form submission to proceed
