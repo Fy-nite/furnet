@@ -84,6 +84,11 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <button id="themeToggle" class="theme-toggle nav-link btn btn-link" title="Toggle dark mode">
+                                <i id="themeIcon" class="bi bi-moon"></i>
+                            </button>
+                        </li>
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item dropdown">
