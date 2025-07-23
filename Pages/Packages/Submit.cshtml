@@ -4,6 +4,10 @@
     ViewData["Title"] = "Submit Package";
 }
 
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+
 <h1><i class="bi bi-plus-circle"></i> Submit New Package</h1>
 <p class="text-muted mb-4">Share your package with the FUR community</p>
 
@@ -43,6 +47,17 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Brief description of your package"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="ReadmeUrl" class="form-label"></label>
+                        <input asp-for="ReadmeUrl" class="form-control" type="url" placeholder="https://github.com/user/repo/blob/main/README.md">
+                        <div class="form-text">Link to your package's README file</div>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label asp-for="Git" class="form-label"></label>
                         <input asp-for="Git" class="form-control" type="url" placeholder="https://git.example.com/user/repo.git">
                         <span asp-validation-for="Git" class="text-danger"></span>
@@ -60,6 +75,12 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label asp-for="Keywords" class="form-label"></label>
+                        <input asp-for="Keywords" class="form-control" placeholder="cli, utility, development">
+                        <div class="form-text">Keywords to help users find your package (optional)</div>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label asp-for="Installer" class="form-label"></label>
                         <input asp-for="Installer" class="form-control" placeholder="install.sh">
                         <div class="form-text">Script that runs during installation (optional)</div>
@@ -68,7 +89,7 @@
                     <div class="mb-3">
                         <label asp-for="Dependencies" class="form-label"></label>
                         <input asp-for="Dependencies" class="form-control" placeholder="make@latest, gcc@1.0.0">
-                        <div class="form-text">Format: package@version, separate with commas</div>
+                        <div class="form-text">Format: package@version, separate with commas (leave empty if no dependencies)</div>
                     </div>
                 </div>
                 <div class="card-footer">
@@ -84,6 +105,18 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
+                <h6 class="mb-0">Authentication Required</h6>
+            </div>
+            <div class="card-body">
+                <p class="small mb-2">
+                    <i class="bi bi-person-check text-success"></i> 
+                    Logged in as: <strong>@User.Identity?.Name</strong>
+                </p>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
                 <h6 class="mb-0">Required Fields</h6>
             </div>
             <div class="card-body">
@@ -94,6 +127,20 @@
                     <li><strong>Git:</strong> Repository URL for package download</li>
                 </ul>
                 <p class="small mt-3 mb-0">All other fields are optional but recommended.</p>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">Optional Fields</h6>
+            </div>
+            <div class="card-body">
+                <ul class="small">
+                    <li><strong>Dependencies:</strong> Leave empty if your package has no dependencies</li>
+                    <li><strong>Keywords:</strong> Help users discover your package</li>
+                    <li><strong>Installer:</strong> Custom installation script</li>
+                    <li><strong>Homepage/Issues:</strong> Project links</li>
+                </ul>
             </div>
         </div>
     </div>

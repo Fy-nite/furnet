@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using furnet.Models;
 using furnet.Services;
 
@@ -9,42 +10,59 @@ namespace furnet.Controllers.Api
     public class PackagesController : ControllerBase
     {
         private readonly ILogger<PackagesController> _logger;
-        private readonly IFurApiService _furApiService;
+        private readonly IPackageService _packageService;
+        private readonly TestingModeService _testingModeService;
 
-        public PackagesController(ILogger<PackagesController> logger, IFurApiService furApiService)
+        public PackagesController(ILogger<PackagesController> logger, IPackageService packageService, TestingModeService testingModeService)
         {
             _logger = logger;
-            _furApiService = furApiService;
-        }
-
-        [HttpGet("{packageName}/{version?}")]
-        public async Task<ActionResult<FurConfig>> GetPackageAsync(string packageName, string? version = null)
-        {
-            try
-            {
-                var furConfig = await _furApiService.GetPackageAsync(packageName, version);
-                
-                if (furConfig == null)
-                    return NotFound($"Package '{packageName}' not found");
-
-                return Ok(furConfig);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting package {PackageName}", packageName);
-                return StatusCode(500, "Internal server error");
-            }
+            _packageService = packageService;
+            _testingModeService = testingModeService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<PackageListResponse>> GetPackagesAsync([FromQuery] string? sort = null, [FromQuery] string? search = null)
+        public async Task<ActionResult<PackageListResponse>> GetPackagesAsync(
+            [FromQuery] string? sort = null, 
+            [FromQuery] string? search = null,
+            [FromQuery] bool details = false,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 50)
         {
             try
             {
-                var response = await _furApiService.GetPackagesAsync(sort, search);
+                if (_testingModeService.IsTestingMode)
+                {
+                    Response.Headers.Add("X-Testing-Mode", "true");
+                }
+
+                var searchResult = await _packageService.SearchPackagesAsync(search, sort, page, pageSize);
                 
-                if (response == null)
-                    return StatusCode(500, "Failed to retrieve packages");
+                var response = new PackageListResponse
+                {
+                    PackageCount = searchResult.TotalCount,
+                    Packages = searchResult.Packages.Select(p => p.Name).ToList()
+                };
+
+                if (details)
+                {
+                    response.PackageDetails = searchResult.Packages.Select(p => new FurConfig
+                    {
+                        Name = p.Name,
+                        Version = p.Version,
+                        Authors = p.Authors,
+                        SupportedPlatforms = p.SupportedPlatforms,
+                        Description = p.Description,
+                        ReadmeUrl = p.ReadmeUrl,
+                        License = p.License,
+                        LicenseUrl = p.LicenseUrl,
+                        Keywords = p.Keywords,
+                        Homepage = p.Homepage,
+                        IssueTracker = p.IssueTracker,
+                        Git = p.Git,
+                        Installer = p.Installer,
+                        Dependencies = p.Dependencies
+                    }).ToList();
+                }
 
                 return Ok(response);
             }
@@ -55,7 +73,54 @@ namespace furnet.Controllers.Api
             }
         }
 
+        [HttpGet("{packageName}")]
+        [HttpGet("{packageName}/{version}")]
+        public async Task<ActionResult<FurConfig>> GetPackageAsync(string packageName, string? version = null)
+        {
+            try
+            {
+                if (_testingModeService.IsTestingMode)
+                {
+                    Response.Headers.Add("X-Testing-Mode", "true");
+                }
+
+                var package = await _packageService.GetPackageAsync(packageName, version);
+                
+                if (package == null)
+                    return NotFound($"Package '{packageName}' not found");
+
+                // Increment view count
+                await _packageService.IncrementViewCountAsync(package.Id);
+
+                var furConfig = new FurConfig
+                {
+                    Name = package.Name,
+                    Version = package.Version,
+                    Authors = package.Authors,
+                    SupportedPlatforms = package.SupportedPlatforms,
+                    Description = package.Description,
+                    ReadmeUrl = package.ReadmeUrl,
+                    License = package.License,
+                    LicenseUrl = package.LicenseUrl,
+                    Keywords = package.Keywords,
+                    Homepage = package.Homepage,
+                    IssueTracker = package.IssueTracker,
+                    Git = package.Git,
+                    Installer = package.Installer,
+                    Dependencies = package.Dependencies
+                };
+
+                return Ok(furConfig);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting package {PackageName}", packageName);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<FurConfig>> UploadPackageAsync([FromBody] FurConfig furConfig)
         {
             if (!ModelState.IsValid)
@@ -63,10 +128,24 @@ namespace furnet.Controllers.Api
 
             try
             {
-                var success = await _furApiService.UploadPackageAsync(furConfig);
+                if (_testingModeService.IsTestingMode)
+                {
+                    Response.Headers.Add("X-Testing-Mode", "true");
+                }
+
+                // Get user info from authentication
+                var userIdClaim = User.FindFirst("UserId");
+                int? userId = null;
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var parsedUserId))
+                {
+                    userId = parsedUserId;
+                }
+
+                var userName = User.Identity?.Name ?? "api-user";
+                var success = await _packageService.SavePackageAsync(furConfig, userName, userId);
                 
                 if (!success)
-                    return StatusCode(500, "Failed to upload package");
+                    return Conflict("Package already exists or failed to upload");
 
                 return CreatedAtAction(nameof(GetPackageAsync), new { packageName = furConfig.Name }, furConfig);
             }
@@ -77,20 +156,110 @@ namespace furnet.Controllers.Api
             }
         }
 
-        [HttpGet("health")]
-        public async Task<ActionResult> HealthCheckAsync()
+        [HttpPost("{packageName}/download")]
+        public async Task<ActionResult> IncrementDownloadAsync(string packageName)
         {
             try
             {
-                var isHealthy = await _furApiService.IsApiHealthyAsync();
-                return Ok(new { status = isHealthy ? "healthy" : "unhealthy" });
+                var package = await _packageService.GetPackageAsync(packageName);
+                if (package == null)
+                    return NotFound();
+
+                await _packageService.IncrementDownloadCountAsync(package.Id);
+                return Ok(new { message = "Download count incremented" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Health check failed");
-                return StatusCode(500, "Health check failed");
+                _logger.LogError(ex, "Error incrementing download count for {PackageName}", packageName);
+                return StatusCode(500, "Internal server error");
             }
         }
 
+        [HttpGet("statistics")]
+        public async Task<ActionResult<PackageStatistics>> GetStatisticsAsync()
+        {
+            try
+            {
+                if (_testingModeService.IsTestingMode)
+                {
+                    Response.Headers.Add("X-Testing-Mode", "true");
+                }
+
+                var stats = await _packageService.GetStatisticsAsync();
+                return Ok(stats);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting statistics");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("tags")]
+        public async Task<ActionResult<List<string>>> GetPopularTagsAsync([FromQuery] int limit = 10)
+        {
+            try
+            {
+                var tags = await _packageService.GetPopularTagsAsync(limit);
+                return Ok(tags);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting popular tags");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("authors")]
+        public async Task<ActionResult<List<string>>> GetPopularAuthorsAsync([FromQuery] int limit = 10)
+        {
+            try
+            {
+                var authors = await _packageService.GetPopularAuthorsAsync(limit);
+                return Ok(authors);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting popular authors");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("tags/{tag}")]
+        public async Task<ActionResult<List<Package>>> GetPackagesByTagAsync(string tag)
+        {
+            try
+            {
+                var packages = await _packageService.GetPackagesByTagAsync(tag);
+                return Ok(packages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting packages by tag {Tag}", tag);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("authors/{author}")]
+        public async Task<ActionResult<List<Package>>> GetPackagesByAuthorAsync(string author)
+        {
+            try
+            {
+                var packages = await _packageService.GetPackagesByAuthorAsync(author);
+                return Ok(packages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting packages by author {Author}", author);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("cache")]
+        public ActionResult ClearCache()
+        {
+            // For compatibility with package managers expecting this endpoint
+            return Ok(new { message = "Cache cleared (using database storage)" });
+        }
     }
 }

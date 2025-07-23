@@ -1,10 +1,56 @@
 ﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
 // for details on configuring this project to bundle and minify static web assets.
 
-// Write your JavaScript code.
+
 
 // Theme management
 document.addEventListener('DOMContentLoaded', function() {
+    // Check if we're in testing mode (passed from server)
+    const isTestingMode = document.body.getAttribute('data-testing-mode') === 'true';
+    if (isTestingMode) {
+        console.log('🧪 FurNet is running in testing mode');
+    }
+    
+    // Check for logout completion and force cleanup
+    const urlParams = new URLSearchParams(window.location.search);
+    const logoutStatus = urlParams.get('logout');
+    
+    if (logoutStatus === 'complete' || logoutStatus === 'error') {
+        console.log('🚪 Logout detected - performing complete cleanup');
+        
+        // Clear ALL storage
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear all cookies via JavaScript
+            document.cookie.split(";").forEach(function(c) { 
+                const eqPos = c.indexOf("=");
+                const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+                if (window.location.hostname.includes('.')) {
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=." + window.location.hostname.split('.').slice(-2).join('.');
+                }
+            });
+            
+            console.log('🚪 Storage and cookies cleared');
+        } catch (e) {
+            console.error('Error clearing storage:', e);
+        }
+        
+        // Remove logout parameter from URL
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+        
+        // Force reload to ensure clean state
+        setTimeout(() => {
+            window.location.reload(true);
+        }, 500);
+        
+        return; // Don't continue with other initialization
+    }
+    
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const htmlElement = document.documentElement;
@@ -16,10 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function applyTheme(theme) {
         if (theme === 'dark') {
             htmlElement.setAttribute('data-theme', 'dark');
-            themeIcon.className = 'bi bi-sun';
+            if (themeIcon) themeIcon.className = 'bi bi-sun';
         } else {
             htmlElement.removeAttribute('data-theme');
-            themeIcon.className = 'bi bi-moon';
+            if (themeIcon) themeIcon.className = 'bi bi-moon';
         }
     }
     
@@ -27,13 +73,15 @@ document.addEventListener('DOMContentLoaded', function() {
     applyTheme(savedTheme);
     
     // Toggle theme
-    themeToggle.addEventListener('click', function() {
-        const currentTheme = htmlElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        applyTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-    });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
     
     // Listen for system theme changes
     if (window.matchMedia) {
@@ -73,4 +121,29 @@ document.addEventListener('DOMContentLoaded', function() {
     window.clearPackageCache = clearPackageCache;
 });
 
-// Existing site.js code (if any) would go here
+// Simple logout cleanup function
+function handleLogout() {
+    console.log('🚪 Logout initiated - clearing storage');
+    
+    try {
+        // Clear all client-side storage
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Clear all cookies via JavaScript
+        document.cookie.split(";").forEach(function(c) { 
+            const eqPos = c.indexOf("=");
+            const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim();
+            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        });
+        
+        console.log('🚪 Client-side cleanup completed');
+    } catch (e) {
+        console.error('Error during logout cleanup:', e);
+    }
+    
+    return true; // Allow form submission to proceed
+}
+
+// Make handleLogout available globally
+window.handleLogout = handleLogout;

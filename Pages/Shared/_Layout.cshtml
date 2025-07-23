@@ -3,18 +3,60 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - FUR Package Repository</title>
+    <title>@ViewData["Title"] - FurNet</title>
+    
+    <!-- Standard meta tags -->
+    <meta name="description" content="@(ViewData["MetaDescription"] ?? "FurNet - Community-driven package repository for FUR (Finite User Repository)")" />
+    <meta name="keywords" content="@(ViewData["MetaKeywords"] ?? "fur, package manager, repository, development tools")" />
+    <meta name="author" content="@(ViewData["MetaAuthors"] ?? "FurNet Community")" />
+    
+    <!-- Open Graph defaults -->
+    <meta property="og:site_name" content="FurNet - Finite User Repository" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@(ViewData["MetaTitle"] ?? ViewData["Title"])" />
+    <meta property="og:description" content="@(ViewData["MetaDescription"] ?? "Community-driven package repository for FUR")" />
+    @if (ViewData["MetaUrl"] != null)
+    {
+        <meta property="og:url" content="@ViewData["MetaUrl"]" />
+    }
+    @if (ViewData["MetaImage"] != null)
+    {
+        <meta property="og:image" content="@ViewData["MetaImage"]" />
+    }
+    
+    <!-- Twitter Card defaults -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="@(ViewData["MetaTitle"] ?? ViewData["Title"])" />
+    <meta name="twitter:description" content="@(ViewData["MetaDescription"] ?? "Community-driven package repository for FUR")" />
+    @if (ViewData["MetaImage"] != null)
+    {
+        <meta name="twitter:image" content="@ViewData["MetaImage"]" />
+    }
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/furnet.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    
+    @await RenderSectionAsync("Head", required: false)
 </head>
 <body>
+    @inject furnet.Services.TestingModeService TestingModeService
+    
+    @if (TestingModeService.IsTestingMode)
+    {
+        <div class="alert alert-warning alert-dismissible mb-0 text-center" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Testing Mode Active</strong> - This is a development/testing environment
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">
-                    <i class="bi bi-box-seam"></i> FUR
+                <a class="navbar-brand" href="/">
+                    <i class="bi bi-box-seam"></i> FurNet
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -23,29 +65,61 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-page="/Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Packages/Browse">Browse Packages</a>
+                            <a class="nav-link" asp-area="" asp-page="/Packages/Browse">Browse</a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-page="/Packages/Submit">Submit</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-page="/About">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Packages/Submit">Submit Package</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>
                     </ul>
-                    <div class="d-flex">
-                        <form class="d-flex me-3" asp-page="/Packages/Search" method="get">
-                            <input class="form-control me-2" type="search" name="query" placeholder="Search packages..." aria-label="Search">
-                            <button class="btn btn-outline-primary" type="submit">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </form>
-                        <button class="theme-toggle me-2" id="themeToggle" title="Toggle dark mode">
-                            <i class="bi bi-moon" id="themeIcon"></i>
-                        </button>
-                    </div>
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/Account/Profile"><i class="bi bi-person"></i> My Profile</a></li>
+                                    @if (User.HasClaim("IsAdmin", "True"))
+                                    {
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Index"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Packages"><i class="bi bi-box-seam"></i> Manage Packages</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Admin/Analytics"><i class="bi bi-graph-up"></i> Analytics</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-page="/Account/Logout" method="post" class="d-inline">
+                                            <input name="__RequestVerificationToken" type="hidden" value="@Html.AntiForgeryToken().ToString()">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-box-arrow-right"></i> Logout
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Account/Login">
+                                    <i class="bi bi-github"></i> Login with GitHub
+                                </a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>
@@ -58,7 +132,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - furnet - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2024 - FurNet - <a asp-area="" asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
 

@@ -1,0 +1,115 @@
+@page
+@model furnet.Pages.Account.ProfileModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h1><i class="bi bi-person-circle"></i> My Profile</h1>
+        
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")" role="alert">
+                @Model.Message
+            </div>
+        }
+
+        @if (Model.CurrentUser != null)
+        {
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="@Model.CurrentUser.AvatarUrl" alt="Avatar" class="img-fluid rounded-circle">
+                        </div>
+                        <div class="col-md-9">
+                            <h4>@Model.CurrentUser.Username</h4>
+                            <p class="text-muted">@Model.CurrentUser.Email</p>
+                            <p><strong>Member since:</strong> @Model.CurrentUser.CreatedAt.ToString("MMMM yyyy")</p>
+                            <p><strong>Last login:</strong> @Model.CurrentUser.LastLoginAt.ToString("MMM dd, yyyy")</p>
+                            @if (Model.CurrentUser.IsAdmin)
+                            {
+                                <span class="badge bg-warning">Administrator</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>My Packages (@Model.OwnedPackages.Count)</h3>
+                    @if (Model.OwnedPackages.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var package in Model.OwnedPackages)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">
+                                            <a href="/Packages/Details/@package.Name">@package.Name</a>
+                                        </h5>
+                                        <small>v @package.Version</small>
+                                    </div>
+                                    <p class="mb-1">@package.Description</p>
+                                    <small>
+                                        <i class="bi bi-download"></i> @package.Downloads.ToString("N0") downloads
+                                        <span class="ms-2"><i class="bi bi-eye"></i> @package.ViewCount views</span>
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">You haven't submitted any packages yet.</p>
+                        <a href="/Packages/Submit" class="btn btn-primary">Submit Your First Package</a>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <h3>Maintained Packages (@Model.MaintainedPackages.Count)</h3>
+                    @if (Model.MaintainedPackages.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var package in Model.MaintainedPackages)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">
+                                            <a href="/Packages/Details/@package.Name">@package.Name</a>
+                                        </h5>
+                                        <small>v @package.Version</small>
+                                    </div>
+                                    <p class="mb-1">@package.Description</p>
+                                    <small>Maintainer</small>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted">You're not maintaining any packages.</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="/Packages/Submit" class="btn btn-primary btn-block mb-2">
+                    <i class="bi bi-plus-circle"></i> Submit New Package
+                </a>
+                <a href="/Packages/Browse" class="btn btn-outline-secondary btn-block">
+                    <i class="bi bi-search"></i> Browse Packages
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

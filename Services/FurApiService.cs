@@ -9,7 +9,9 @@ namespace furnet.Services
         private readonly HttpClient _httpClient;
         private readonly ILogger<FurApiService> _logger;
         private readonly IMemoryCache _cache;
+        private readonly ILocalPackageService _localPackageService;
         private readonly string _baseUrl;
+        private readonly bool _useLocalStorageWhenOffline;
         private const string CACHE_KEY_PACKAGES = "cached_packages";
         private const string CACHE_KEY_PACKAGE_COUNT = "cached_package_count";
         private const string CACHE_KEY_PACKAGE_DETAILS = "cached_package_details";
@@ -17,18 +19,24 @@ namespace furnet.Services
 
         public bool IsApiAvailable { get; private set; } = true;
 
-        public FurApiService(HttpClient httpClient, ILogger<FurApiService> logger, IMemoryCache cache, IConfiguration configuration)
+        public bool UseLocalStorage => !IsApiAvailable && _useLocalStorageWhenOffline;
+
+        public FurApiService(HttpClient httpClient, ILogger<FurApiService> logger, IMemoryCache cache, 
+            ILocalPackageService localPackageService, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _logger = logger;
             _cache = cache;
+            _localPackageService = localPackageService;
             _baseUrl = configuration.GetValue<string>("ApiSettings:BaseUrl") ?? "http://localhost:5001";
+            _useLocalStorageWhenOffline = configuration.GetValue<bool>("ApiSettings:UseLocalStorageWhenOffline", true);
             _httpClient.BaseAddress = new Uri(_baseUrl);
             _httpClient.Timeout = TimeSpan.FromSeconds(10);
         }
 
         public async Task<PackageListResponse?> GetPackagesAsync(string? sort = null, string? search = null)
         {
+            // Try external API first
             try
             {
                 var queryParams = new List<string>();
@@ -71,18 +79,33 @@ namespace furnet.Services
                 }
                 
                 IsApiAvailable = false;
-                return GetCachedPackageResponse(sort, search);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching packages from API");
                 IsApiAvailable = false;
-                return GetCachedPackageResponse(sort, search);
             }
+
+            // Fallback to local storage if configured
+            if (_useLocalStorageWhenOffline)
+            {
+                try
+                {
+                    _logger.LogInformation("Using local package storage");
+                    return await _localPackageService.GetPackageListAsync(sort, search, false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error fetching packages from local storage");
+                }
+            }
+
+            return GetCachedPackageResponse(sort, search);
         }
 
         public async Task<FurConfig?> GetPackageAsync(string packageName, string? version = null)
         {
+            // Try external API first
             try
             {
                 var url = version != null 
@@ -99,18 +122,32 @@ namespace furnet.Services
                         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                     });
                 }
-                
-                return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching package {PackageName} from API", packageName);
-                return null;
             }
+
+            // Fallback to local storage if configured
+            if (_useLocalStorageWhenOffline)
+            {
+                try
+                {
+                    _logger.LogInformation("Using local storage for package {PackageName}", packageName);
+                    return await _localPackageService.GetPackageAsync(packageName, version);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error fetching package {PackageName} from local storage", packageName);
+                }
+            }
+            
+            return null;
         }
 
         public async Task<bool> UploadPackageAsync(FurConfig furConfig)
         {
+            // Try external API first
             try
             {
                 var json = JsonSerializer.Serialize(furConfig, new JsonSerializerOptions
@@ -134,14 +171,33 @@ namespace furnet.Services
                     _logger.LogError("Failed to upload package {PackageName}. Status: {StatusCode}, Error: {Error}", 
                         furConfig.Name, response.StatusCode, errorContent);
                 }
-                
-                return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error uploading package {PackageName}", furConfig.Name);
-                return false;
+                _logger.LogError(ex, "Error uploading package {PackageName} to external API", furConfig.Name);
             }
+
+            // Fallback to local storage if configured
+            if (_useLocalStorageWhenOffline)
+            {
+                try
+                {
+                    _logger.LogInformation("Saving package {PackageName} to local storage", furConfig.Name);
+                    var success = await _localPackageService.SavePackageAsync(furConfig);
+                    if (success)
+                    {
+                        ClearCache();
+                        _logger.LogInformation("Package {PackageName} saved to local storage, cache cleared", furConfig.Name);
+                    }
+                    return success;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error saving package {PackageName} to local storage", furConfig.Name);
+                }
+            }
+            
+            return false;
         }
 
         public async Task<bool> IsApiHealthyAsync()
@@ -199,11 +255,10 @@ namespace furnet.Services
                             Authors = furConfig.Authors,
                             SupportedPlatforms = furConfig.SupportedPlatforms,
                             Description = furConfig.Description,
-                            LongDescription = furConfig.LongDescription,
+                            ReadmeUrl = furConfig.ReadmeUrl,
                             License = furConfig.License,
                             LicenseUrl = furConfig.LicenseUrl,
                             Keywords = furConfig.Keywords,
-                            Tags = furConfig.Tags,
                             Homepage = furConfig.Homepage,
                             IssueTracker = furConfig.IssueTracker,
                             Git = furConfig.Git,
@@ -252,11 +307,10 @@ namespace furnet.Services
                             Authors = furConfig.Authors,
                             SupportedPlatforms = furConfig.SupportedPlatforms,
                             Description = furConfig.Description,
-                            LongDescription = furConfig.LongDescription,
+                            ReadmeUrl = furConfig.ReadmeUrl,
                             License = furConfig.License,
                             LicenseUrl = furConfig.LicenseUrl,
                             Keywords = furConfig.Keywords,
-                            Tags = furConfig.Tags,
                             Homepage = furConfig.Homepage,
                             IssueTracker = furConfig.IssueTracker,
                             Git = furConfig.Git,
