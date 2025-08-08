@@ -66,6 +66,7 @@ namespace furnet.Services
                     License = furConfig.License ?? string.Empty,
                     LicenseUrl = furConfig.LicenseUrl ?? string.Empty,
                     Keywords = furConfig.Keywords ?? new List<string>(),
+                    Categories = furConfig.Categories ?? new List<string>(),
                     Homepage = furConfig.Homepage ?? string.Empty,
                     IssueTracker = furConfig.IssueTracker ?? string.Empty,
                     Git = furConfig.Git,
@@ -120,6 +121,7 @@ namespace furnet.Services
                 package.License = furConfig.License ?? string.Empty;
                 package.LicenseUrl = furConfig.LicenseUrl ?? string.Empty;
                 package.Keywords = furConfig.Keywords ?? new List<string>();
+                package.Categories = furConfig.Categories ?? new List<string>();
                 package.Homepage = furConfig.Homepage ?? string.Empty;
                 package.IssueTracker = furConfig.IssueTracker ?? string.Empty;
                 package.Git = furConfig.Git;
@@ -195,7 +197,8 @@ namespace furnet.Services
                     (!string.IsNullOrEmpty(p.Name) && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                     (!string.IsNullOrEmpty(p.Description) && p.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                     (p.Authors != null && p.Authors.Any(a => !string.IsNullOrEmpty(a) && a.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))) ||
-                    (p.Keywords != null && p.Keywords.Any(k => !string.IsNullOrEmpty(k) && k.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+                    (p.Keywords != null && p.Keywords.Any(k => !string.IsNullOrEmpty(k) && k.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))) ||
+                    (p.Categories != null && p.Categories.Any(c => !string.IsNullOrEmpty(c) && c.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
                 ).ToList();
             }
             else
@@ -231,34 +234,64 @@ namespace furnet.Services
             };
         }
 
-        public async Task<PackageListResponse> GetPackageListAsync(string? sort = null, string? search = null, bool includeDetails = false)
+        public async Task<List<Package>> GetPackagesByTagAsync(string tag)
         {
-            var searchResult = await SearchPackagesAsync(search, sort, 1, 1000);
+            return await _context.Packages
+                .Where(p => p.IsActive && p.Keywords.Contains(tag))
+                .OrderByDescending(p => p.Downloads)
+                .ToListAsync();
+        }
 
-            var response = new PackageListResponse
-            {
-                PackageCount = searchResult.TotalCount,
-                Packages = searchResult.Packages.Select(p => p.Name).ToList()
-            };
+        public async Task<List<Package>> GetPackagesByAuthorAsync(string author)
+        {
+            return await _context.Packages
+                .Where(p => p.IsActive && p.Authors.Contains(author))
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+        }
 
-            if (includeDetails)
-            {
-                response.PackageDetails = searchResult.Packages.Select(p => new FurConfig
-                {
-                    Name = p.Name,
-                    Version = p.Version,
-                    Authors = p.Authors,
-                    Description = p.Description,
-                    Keywords = p.Keywords,
-                    Homepage = p.Homepage,
-                    IssueTracker = p.IssueTracker,
-                    Git = p.Git,
-                    Installer = p.Installer,
-                    Dependencies = p.Dependencies
-                }).ToList();
-            }
+        public async Task<List<Package>> GetPackagesByCategoryAsync(string category)
+        {
+            return await _context.Packages
+                .Where(p => p.IsActive && p.Categories.Contains(category))
+                .OrderByDescending(p => p.Downloads)
+                .ToListAsync();
+        }
 
-            return response;
+        public async Task<List<string>> GetPopularTagsAsync(int limit = 10)
+        {
+            var packages = await _context.Packages.Where(p => p.IsActive).ToListAsync();
+            return packages
+                .SelectMany(p => p.Keywords)
+                .GroupBy(t => t)
+                .OrderByDescending(g => g.Count())
+                .Take(limit)
+                .Select(g => g.Key)
+                .ToList();
+        }
+
+        public async Task<List<string>> GetPopularAuthorsAsync(int limit = 10)
+        {
+            var packages = await _context.Packages.Where(p => p.IsActive).ToListAsync();
+            return packages
+                .SelectMany(p => p.Authors)
+                .GroupBy(a => a)
+                .OrderByDescending(g => g.Count())
+                .Take(limit)
+                .Select(g => g.Key)
+                .ToList();
+        }
+
+        public async Task<List<string>> GetPopularCategoriesAsync(int limit = 10)
+        {
+            var packages = await _context.Packages.Where(p => p.IsActive).ToListAsync();
+            return packages
+                .SelectMany(p => p.Categories)
+                .GroupBy(c => c)
+                .OrderByDescending(g => g.Count())
+                .Take(limit)
+                .Select(g => g.Key)
+                .ToList();
         }
 
         public async Task<PackageStatistics> GetStatisticsAsync()
@@ -360,6 +393,7 @@ namespace furnet.Services
                     License = "MIT",
                     LicenseUrl = "https://opensource.org/license/mit/",
                     Keywords = new List<string> { "web", "framework", "http" },
+                    Categories = new List<string> { "web-development", "frameworks" },
                     Homepage = "https://example.com/web-framework",
                     IssueTracker = "https://github.com/devuser1/web-framework/issues",
                     Git = "https://github.com/devuser1/web-framework.git",
@@ -376,6 +410,7 @@ namespace furnet.Services
                     License = "Apache-2.0",
                     LicenseUrl = "https://www.apache.org/licenses/LICENSE-2.0",
                     Keywords = new List<string> { "json", "parser", "streaming" },
+                    Categories = new List<string> { "parsing", "data-processing", "utilities" },
                     Homepage = "https://example.com/json-parser",
                     IssueTracker = "https://github.com/jsondev/json-parser/issues",
                     Git = "https://github.com/jsondev/json-parser.git",
@@ -392,88 +427,35 @@ namespace furnet.Services
             _logger.LogInformation("Created {Count} default packages", defaultPackages.Count);
         }
 
-        public async Task<List<Package>> GetPackagesByTagAsync(string tag)
+        public async Task<PackageListResponse> GetPackageListAsync(string? sort = null, string? search = null, bool includeDetails = false)
         {
-            return await _context.Packages
-                .Where(p => p.IsActive && p.Keywords.Contains(tag))
-                .OrderByDescending(p => p.Downloads)
-                .ToListAsync();
-        }
+            var searchResult = await SearchPackagesAsync(search, sort, 1, 1000);
 
-        public async Task<List<Package>> GetPackagesByAuthorAsync(string author)
-        {
-            return await _context.Packages
-                .Where(p => p.IsActive && p.Authors.Contains(author))
-                .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
-        }
-
-        public async Task<List<string>> GetPopularTagsAsync(int limit = 10)
-        {
-            var packages = await _context.Packages.Where(p => p.IsActive).ToListAsync();
-            return packages
-                .SelectMany(p => p.Keywords)
-                .GroupBy(t => t)
-                .OrderByDescending(g => g.Count())
-                .Take(limit)
-                .Select(g => g.Key)
-                .ToList();
-        }
-
-        public async Task<List<string>> GetPopularAuthorsAsync(int limit = 10)
-        {
-            var packages = await _context.Packages.Where(p => p.IsActive).ToListAsync();
-            return packages
-                .SelectMany(p => p.Authors)
-                .GroupBy(a => a)
-                .OrderByDescending(g => g.Count())
-                .Take(limit)
-                .Select(g => g.Key)
-                .ToList();
-        }
-
-        public async Task<bool> ClearAllDataAsync()
-        {
-            try
+            var response = new PackageListResponse
             {
-                _context.Packages.RemoveRange(_context.Packages);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error clearing all data");
-                return false;
-            }
-        }
+                PackageCount = searchResult.TotalCount,
+                Packages = searchResult.Packages.Select(p => p.Name).ToList()
+            };
 
-        public async Task<bool> ImportPackagesFromJsonAsync(string jsonFilePath)
-        {
-            try
+            if (includeDetails)
             {
-                if (!File.Exists(jsonFilePath))
+                response.PackageDetails = searchResult.Packages.Select(p => new FurConfig
                 {
-                    return false;
-                }
-
-                var json = await File.ReadAllTextAsync(jsonFilePath);
-                var packages = JsonSerializer.Deserialize<List<FurConfig>>(json);
-
-                if (packages != null)
-                {
-                    foreach (var package in packages)
-                    {
-                        await SavePackageAsync(package, "import");
-                    }
-                }
-
-                return true;
+                    Name = p.Name,
+                    Version = p.Version,
+                    Authors = p.Authors,
+                    Description = p.Description,
+                    Keywords = p.Keywords,
+                    Categories = p.Categories,
+                    Homepage = p.Homepage,
+                    IssueTracker = p.IssueTracker,
+                    Git = p.Git,
+                    Installer = p.Installer,
+                    Dependencies = p.Dependencies
+                }).ToList();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error importing packages from JSON");
-                return false;
-            }
+
+            return response;
         }
 
         public async Task<bool> ExportPackagesToJsonAsync(string jsonFilePath)
@@ -488,6 +470,7 @@ namespace furnet.Services
                     Authors = p.Authors,
                     Description = p.Description,
                     Keywords = p.Keywords,
+                    Categories = p.Categories,
                     Homepage = p.Homepage,
                     IssueTracker = p.IssueTracker,
                     Git = p.Git,
@@ -509,6 +492,62 @@ namespace furnet.Services
         public async Task<int> GetPackageCountAsync()
         {
             return await _context.Packages.CountAsync(p => p.IsActive);
+        }
+
+        public async Task<bool> ClearAllDataAsync()
+        {
+            try
+            {
+                var packages = await _context.Packages.ToListAsync();
+                _context.Packages.RemoveRange(packages);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Cleared all package data");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error clearing all package data");
+                return false;
+            }
+        }
+
+        public async Task<bool> ImportPackagesFromJsonAsync(string jsonFilePath)
+        {
+            try
+            {
+                if (!File.Exists(jsonFilePath))
+                {
+                    _logger.LogError("JSON file not found: {FilePath}", jsonFilePath);
+                    return false;
+                }
+
+                var json = await File.ReadAllTextAsync(jsonFilePath);
+                var furConfigs = JsonSerializer.Deserialize<List<FurConfig>>(json);
+
+                if (furConfigs == null || !furConfigs.Any())
+                {
+                    _logger.LogWarning("No packages found in JSON file: {FilePath}", jsonFilePath);
+                    return true;
+                }
+
+                int importedCount = 0;
+                foreach (var furConfig in furConfigs)
+                {
+                    if (await SavePackageAsync(furConfig, "import"))
+                    {
+                        importedCount++;
+                    }
+                }
+
+                _logger.LogInformation("Imported {ImportedCount} out of {TotalCount} packages from {FilePath}", 
+                    importedCount, furConfigs.Count, jsonFilePath);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error importing packages from JSON file: {FilePath}", jsonFilePath);
+                return false;
+            }
         }
     }
 }

@@ -89,6 +89,19 @@
                             by @(package.Authors.Any() ? string.Join(", ", package.Authors) : "Unknown")
                         </p>
                         <p class="card-text">@package.Description</p>
+                        @if (package.Categories.Any())
+                        {
+                            <div class="mb-2">
+                                @foreach (var category in package.Categories.Take(2))
+                                {
+                                    <span class="badge bg-primary me-1">@category</span>
+                                }
+                                @if (package.Categories.Count > 2)
+                                {
+                                    <span class="text-muted small">+@(package.Categories.Count - 2) more</span>
+                                }
+                            </div>
+                        }
                         @if (package.Keywords.Any())
                         {
                             <div class="mb-3">

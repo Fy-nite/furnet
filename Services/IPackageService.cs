@@ -19,12 +19,14 @@ namespace furnet.Services
         Task<PackageListResponse> GetPackageListAsync(string? sort = null, string? search = null, bool includeDetails = false);
         Task<List<Package>> GetPackagesByTagAsync(string tag);
         Task<List<Package>> GetPackagesByAuthorAsync(string author);
+        Task<List<Package>> GetPackagesByCategoryAsync(string category);
 
         // Statistics and analytics
         Task<PackageStatistics> GetStatisticsAsync();
         Task<bool> IncrementDownloadCountAsync(int packageId);
         Task<bool> IncrementViewCountAsync(int packageId);
         Task<List<string>> GetPopularTagsAsync(int limit = 10);
+        Task<List<string>> GetPopularCategoriesAsync(int limit = 10);
         Task<List<string>> GetPopularAuthorsAsync(int limit = 10);
 
         // Database management

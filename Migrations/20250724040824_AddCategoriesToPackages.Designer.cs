@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using furnet.Data;
 
@@ -10,9 +11,11 @@ using furnet.Data;
 namespace furnet.Migrations
 {
     [DbContext(typeof(FurDbContext))]
-    partial class FurDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250724040824_AddCategoriesToPackages")]
+    partial class AddCategoriesToPackages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");

@@ -81,6 +81,12 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label asp-for="Categories" class="form-label"></label>
+                        <input asp-for="Categories" class="form-control" placeholder="web-development, frameworks, utilities">
+                        <div class="form-text">Categories to organize your package (optional)</div>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label asp-for="Installer" class="form-label"></label>
                         <input asp-for="Installer" class="form-control" placeholder="install.sh">
                         <div class="form-text">Script that runs during installation (optional)</div>
@@ -138,6 +144,7 @@
                 <ul class="small">
                     <li><strong>Dependencies:</strong> Leave empty if your package has no dependencies</li>
                     <li><strong>Keywords:</strong> Help users discover your package</li>
+                    <li><strong>Categories:</strong> Organize your package by type</li>
                     <li><strong>Installer:</strong> Custom installation script</li>
                     <li><strong>Homepage/Issues:</strong> Project links</li>
                 </ul>

@@ -56,6 +56,7 @@ namespace furnet.Controllers.Api
                         License = p.License,
                         LicenseUrl = p.LicenseUrl,
                         Keywords = p.Keywords,
+                        Categories = p.Categories,
                         Homepage = p.Homepage,
                         IssueTracker = p.IssueTracker,
                         Git = p.Git,
@@ -103,6 +104,7 @@ namespace furnet.Controllers.Api
                     License = package.License,
                     LicenseUrl = package.LicenseUrl,
                     Keywords = package.Keywords,
+                    Categories = package.Categories,
                     Homepage = package.Homepage,
                     IssueTracker = package.IssueTracker,
                     Git = package.Git,
@@ -225,6 +227,21 @@ namespace furnet.Controllers.Api
             }
         }
 
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<string>>> GetPopularCategoriesAsync([FromQuery] int limit = 10)
+        {
+            try
+            {
+                var categories = await _packageService.GetPopularCategoriesAsync(limit);
+                return Ok(categories);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting popular categories");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
         [HttpGet("tags/{tag}")]
         public async Task<ActionResult<List<Package>>> GetPackagesByTagAsync(string tag)
         {
@@ -251,6 +268,21 @@ namespace furnet.Controllers.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting packages by author {Author}", author);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("categories/{category}")]
+        public async Task<ActionResult<List<Package>>> GetPackagesByCategoryAsync(string category)
+        {
+            try
+            {
+                var packages = await _packageService.GetPackagesByCategoryAsync(category);
+                return Ok(packages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting packages by category {Category}", category);
                 return StatusCode(500, "Internal server error");
             }
         }

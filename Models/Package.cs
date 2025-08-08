@@ -28,6 +28,9 @@ namespace furnet.Models
         
         public List<string> Keywords { get; set; } = new();
         
+        // Add categories support
+        public List<string> Categories { get; set; } = new();
+        
         public string Homepage { get; set; } = string.Empty;
         
         public string IssueTracker { get; set; } = string.Empty;
@@ -97,6 +100,10 @@ namespace furnet.Models
         
         [JsonPropertyName("keywords")]
         public List<string> Keywords { get; set; } = new();
+        
+        // Add categories support to FurConfig
+        [JsonPropertyName("categories")]
+        public List<string> Categories { get; set; } = new();
         
         [JsonPropertyName("homepage")]
         public string Homepage { get; set; } = string.Empty;

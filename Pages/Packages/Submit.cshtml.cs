@@ -60,6 +60,10 @@ namespace furnet.Pages.Packages
         [Display(Name = "Keywords (comma-separated)")]
         public string? Keywords { get; set; }
 
+        [BindProperty]
+        [Display(Name = "Categories (comma-separated)")]
+        public string? Categories { get; set; }
+
         public string? Message { get; set; }
         public bool IsSuccess { get; set; }
 
@@ -103,6 +107,16 @@ namespace furnet.Pages.Packages
                         .ToList();
                 }
 
+                // Parse categories safely
+                var categoriesList = new List<string>();
+                if (!string.IsNullOrWhiteSpace(Categories))
+                {
+                    categoriesList = Categories.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                        .Select(c => c.Trim())
+                        .Where(c => !string.IsNullOrEmpty(c))
+                        .ToList();
+                }
+
                 // Parse authors safely
                 var authorsList = Authors.Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(a => a.Trim())
@@ -127,7 +141,8 @@ namespace furnet.Pages.Packages
                     Git = Git.Trim(),
                     Installer = Installer?.Trim() ?? string.Empty,
                     Dependencies = dependenciesList,
-                    Keywords = keywordsList
+                    Keywords = keywordsList,
+                    Categories = categoriesList
                 };
 
                 // Get current user info for package creation tracking
@@ -159,6 +174,7 @@ namespace furnet.Pages.Packages
                     Installer = null;
                     Dependencies = null;
                     Keywords = null;
+                    Categories = null;
                     
                     // Redirect to package details page
                     return RedirectToPage("/Packages/Details", new { packageName = furConfig.Name });
