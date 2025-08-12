@@ -7,6 +7,14 @@ using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using DotNetEnv;
+using Purrnet.Commands; // Add this for AdminCommand
+
+// Handle admin CLI commands before starting the web server
+if (args.Length > 0 && args[0] == "--admin")
+{
+    var exitCode = await AdminCommand.ExecuteAsync(args);
+    return exitCode;
+}
 
 // Load environment variables from .env file
 Env.Load();
