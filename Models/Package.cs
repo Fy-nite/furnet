@@ -101,7 +101,7 @@ namespace Purrnet.Models
         [JsonPropertyName("keywords")]
         public List<string> Keywords { get; set; } = new();
         
-        // Add categories support to FurConfig
+        // Add categories support to PurrConfig
         [JsonPropertyName("categories")]
         public List<string> Categories { get; set; } = new();
         

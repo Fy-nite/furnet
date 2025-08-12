@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace furnet.Migrations
+namespace Purrnet.Migrations
 {
     /// <inheritdoc />
     public partial class AddCategoriesToPackages : Migration

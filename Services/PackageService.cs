@@ -359,6 +359,14 @@ namespace Purrnet.Services
                 .ToListAsync();
         }
 
+        public async Task<List<Package>> GetPackagesByCategoryAsync(string category)
+        {
+            return await _context.Packages
+                .Where(p => p.IsActive && p.Categories.Contains(category))
+                .OrderByDescending(p => p.Downloads)
+                .ToListAsync();
+        }
+
         public async Task<List<string>> GetPopularTagsAsync(int limit = 10)
         {
             var packages = await _context.Packages.Where(p => p.IsActive).ToListAsync();
@@ -383,84 +391,16 @@ namespace Purrnet.Services
                 .ToList();
         }
 
-        public async Task<bool> ClearAllDataAsync()
+        public async Task<List<string>> GetPopularCategoriesAsync(int limit = 10)
         {
-            try
-            {
-                _context.Packages.RemoveRange(_context.Packages);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error clearing all data");
-                return false;
-            }
-        }
-
-        public async Task<bool> ImportPackagesFromJsonAsync(string jsonFilePath)
-        {
-            try
-            {
-                if (!File.Exists(jsonFilePath))
-                {
-                    return false;
-                }
-
-                var json = await File.ReadAllTextAsync(jsonFilePath);
-                var packages = JsonSerializer.Deserialize<List<PurrConfig>>(json);
-
-                if (packages != null)
-                {
-                    foreach (var package in packages)
-                    {
-                        await SavePackageAsync(package, "import");
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error importing packages from JSON");
-                return false;
-            }
-        }
-
-        public async Task<bool> ExportPackagesToJsonAsync(string jsonFilePath)
-        {
-            try
-            {
-                var packages = await GetAllPackagesAsync();
-                var PurrConfigs = packages.Select(p => new PurrConfig
-                {
-                    Name = p.Name,
-                    Version = p.Version,
-                    Authors = p.Authors,
-                    Description = p.Description,
-                    Keywords = p.Keywords,
-                    Categories = p.Categories,
-                    Homepage = p.Homepage,
-                    IssueTracker = p.IssueTracker,
-                    Git = p.Git,
-                    Installer = p.Installer,
-                    Dependencies = p.Dependencies
-                }).ToList();
-
-                var json = JsonSerializer.Serialize(PurrConfigs, new JsonSerializerOptions { WriteIndented = true });
-                await File.WriteAllTextAsync(jsonFilePath, json);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error exporting packages to JSON");
-                return false;
-            }
-        }
-
-        public async Task<int> GetPackageCountAsync()
-        {
-            return await _context.Packages.CountAsync(p => p.IsActive);
+            var packages = await _context.Packages.Where(p => p.IsActive).ToListAsync();
+            return packages
+                .SelectMany(p => p.Categories)
+                .GroupBy(c => c)
+                .OrderByDescending(g => g.Count())
+                .Take(limit)
+                .Select(g => g.Key)
+                .ToList();
         }
 
         public async Task<bool> ClearAllDataAsync()
@@ -491,25 +431,25 @@ namespace Purrnet.Services
                 }
 
                 var json = await File.ReadAllTextAsync(jsonFilePath);
-                var furConfigs = JsonSerializer.Deserialize<List<FurConfig>>(json);
+                var PurrConfigs = JsonSerializer.Deserialize<List<PurrConfig>>(json);
 
-                if (furConfigs == null || !furConfigs.Any())
+                if (PurrConfigs == null || !PurrConfigs.Any())
                 {
                     _logger.LogWarning("No packages found in JSON file: {FilePath}", jsonFilePath);
                     return true;
                 }
 
                 int importedCount = 0;
-                foreach (var furConfig in furConfigs)
+                foreach (var PurrConfig in PurrConfigs)
                 {
-                    if (await SavePackageAsync(furConfig, "import"))
+                    if (await SavePackageAsync(PurrConfig, "import"))
                     {
                         importedCount++;
                     }
                 }
 
                 _logger.LogInformation("Imported {ImportedCount} out of {TotalCount} packages from {FilePath}", 
-                    importedCount, furConfigs.Count, jsonFilePath);
+                    importedCount, PurrConfigs.Count, jsonFilePath);
                 return true;
             }
             catch (Exception ex)
@@ -517,6 +457,28 @@ namespace Purrnet.Services
                 _logger.LogError(ex, "Error importing packages from JSON file: {FilePath}", jsonFilePath);
                 return false;
             }
+        }
+
+        public Task<bool> ExportPackagesToJsonAsync(string jsonFilePath)
+        {
+            try
+            {
+                var packages = _context.Packages.ToList();
+                var json = JsonSerializer.Serialize(packages, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(jsonFilePath, json);
+                _logger.LogInformation("Exported {Count} packages to {FilePath}", packages.Count, jsonFilePath);
+                return Task.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exporting packages to JSON file: {FilePath}", jsonFilePath);
+                return Task.FromResult(false);
+            }
+        }
+
+        public async Task<int> GetPackageCountAsync()
+        {
+            return await _context.Packages.CountAsync(p => p.IsActive);
         }
     }
 }

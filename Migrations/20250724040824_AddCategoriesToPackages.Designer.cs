@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using furnet.Data;
+using Purrnet.Data;
 
 #nullable disable
 
-namespace furnet.Migrations
+namespace Purrnet.Migrations
 {
-    [DbContext(typeof(FurDbContext))]
+    [DbContext(typeof(PurrDbContext))]
     [Migration("20250724040824_AddCategoriesToPackages")]
     partial class AddCategoriesToPackages
     {
@@ -35,7 +35,7 @@ namespace furnet.Migrations
                     b.ToTable("PackageMaintainer");
                 });
 
-            modelBuilder.Entity("furnet.Models.AdminActivityEntity", b =>
+            modelBuilder.Entity("Purrnet.Models.AdminActivityEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,7 +84,7 @@ namespace furnet.Migrations
                     b.ToTable("AdminActivities");
                 });
 
-            modelBuilder.Entity("furnet.Models.Package", b =>
+            modelBuilder.Entity("Purrnet.Models.Package", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -226,7 +226,7 @@ namespace furnet.Migrations
                     b.ToTable("Packages");
                 });
 
-            modelBuilder.Entity("furnet.Models.User", b =>
+            modelBuilder.Entity("Purrnet.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -276,22 +276,22 @@ namespace furnet.Migrations
 
             modelBuilder.Entity("PackageMaintainer", b =>
                 {
-                    b.HasOne("furnet.Models.Package", null)
+                    b.HasOne("Purrnet.Models.Package", null)
                         .WithMany()
                         .HasForeignKey("PackageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("furnet.Models.User", null)
+                    b.HasOne("Purrnet.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("furnet.Models.AdminActivityEntity", b =>
+            modelBuilder.Entity("Purrnet.Models.AdminActivityEntity", b =>
                 {
-                    b.HasOne("furnet.Models.User", "User")
+                    b.HasOne("Purrnet.Models.User", "User")
                         .WithMany("AdminActivities")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -300,9 +300,9 @@ namespace furnet.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("furnet.Models.Package", b =>
+            modelBuilder.Entity("Purrnet.Models.Package", b =>
                 {
-                    b.HasOne("furnet.Models.User", "Owner")
+                    b.HasOne("Purrnet.Models.User", "Owner")
                         .WithMany("OwnedPackages")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -310,7 +310,7 @@ namespace furnet.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("furnet.Models.User", b =>
+            modelBuilder.Entity("Purrnet.Models.User", b =>
                 {
                     b.Navigation("AdminActivities");
 
