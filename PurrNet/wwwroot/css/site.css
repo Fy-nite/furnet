@@ -12,6 +12,7 @@
     --muted-text: #ffffff;
     --footer-bg: #2d1457;
     --shadow-color: rgba(80,40,120,0.2);
+    color: white;
 }
 
 [data-theme="dark"] {
@@ -50,7 +51,9 @@ body {
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
-
+h1, h2, h3, h4, h5, h6,li,ul,a,p {
+  color: white;
+}
 html {
   position: relative;
   min-height: 100%;
