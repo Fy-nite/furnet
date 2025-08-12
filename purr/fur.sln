@@ -1,8 +1,9 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.2.0
+VisualStudioVersion = 17.14.36202.13 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "purrnet", "purrnet.csproj", "{890C74A4-50BD-AC2E-0288-D5695E84D27C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fur", "fur.csproj", "{FE16DFF5-25FB-4397-B82E-FFF9E8CC2AEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{890C74A4-50BD-AC2E-0288-D5695E84D27C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{890C74A4-50BD-AC2E-0288-D5695E84D27C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{890C74A4-50BD-AC2E-0288-D5695E84D27C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{890C74A4-50BD-AC2E-0288-D5695E84D27C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE16DFF5-25FB-4397-B82E-FFF9E8CC2AEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE16DFF5-25FB-4397-B82E-FFF9E8CC2AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE16DFF5-25FB-4397-B82E-FFF9E8CC2AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE16DFF5-25FB-4397-B82E-FFF9E8CC2AEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9DEF7E01-78DA-48B2-9699-DF9AFD9D97F7}
+		SolutionGuid = {5624A7BA-8A8D-4DD2-8B46-E867F23FD75D}
 	EndGlobalSection
 EndGlobal
