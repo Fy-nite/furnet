@@ -9,7 +9,7 @@ public class ApiService : IDisposable
     private readonly HttpClient _httpClient;
     private readonly string[] _baseUrls;
     // Changed to HTTP for local development - update this when deploying
-    private const string BaseUrl = "http://finitenet.runasp.net"; 
+    public const string BaseUrl = "http://purr.finite.ovh"; 
 
     public ApiService(string[] baseUrls)
     {
@@ -19,7 +19,7 @@ public class ApiService : IDisposable
     }
 
     // For backward compatibility
-    public ApiService() : this(new[] { "http://finitenet.runasp.net" }) {}
+    public ApiService() : this(new[] { BaseUrl }) {}
 
     public async Task<FurConfig?> GetPackageInfoAsync(string packageName, string? version = null)
     {
