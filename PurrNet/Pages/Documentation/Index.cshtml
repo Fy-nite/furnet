@@ -1,0 +1,124 @@
+﻿@page
+@model purrnet.Pages.Documentation.IndexModel
+@using Markdig
+@{
+    ViewData["Title"] = "Documentation";
+    var sidebarPages = Model.DocumentationPages.GroupBy(d => d.Category ?? "General");
+}
+
+<div class="doc-layout">
+    <aside class="sidebar">
+        <h5>Documentation</h5>
+        <ul>
+            @foreach (var group in sidebarPages)
+            {
+                <li>
+                    <strong>@group.Key</strong>
+                    <ul>
+                        @foreach (var doc in group)
+                        {
+                            <li>
+                                <a class="@(Model.SelectedTitle == doc.Title ? "active" : "")" href="?page=@doc.Title">@doc.Title</a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+    </aside>
+    <main class="doc-content">
+        <div class="doc-header">
+            <h2>@(Model.SelectedTitle ?? "Welcome to the Documentation")</h2>
+        </div>
+        <div class="markdown-body">
+            @if (!string.IsNullOrEmpty(Model.SelectedContent))
+            {
+                @Html.Raw(Markdown.ToHtml(Model.SelectedContent))
+            }
+            else
+            {
+                <p class="text-muted">Select a topic from the sidebar to get started.</p>
+            }
+        </div>
+    </main>
+</div>
+
+<style>
+.doc-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #181a1b;
+}
+.sidebar {
+    width: 260px;
+    background: #23272b;
+    color: #f8f9fa;
+    padding: 2rem 1rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+    border-radius: 0 1rem 1rem 0;
+}
+.sidebar h5 {
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    color: #7fd7ff;
+}
+.sidebar ul {
+    list-style: none;
+    padding-left: 0;
+}
+.sidebar li {
+    margin-bottom: 0.5rem;
+}
+.sidebar a {
+    color: #f8f9fa;
+    text-decoration: none;
+    display: block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: background 0.2s, color 0.2s;
+}
+.sidebar a.active, .sidebar a:hover {
+    background: #0d6efd;
+    color: #fff;
+    font-weight: bold;
+}
+.doc-content {
+    flex: 1;
+    padding: 2rem 2rem 2rem 0;
+    color: #f8f9fa;
+    background: #222;
+    min-width: 0;
+}
+.doc-header {
+    border-bottom: 1px solid #444;
+    margin-bottom: 2rem;
+}
+.markdown-body {
+    background: #23272b;
+    padding: 2rem;
+    border-radius: 1rem;
+    color: #f8f9fa;
+}
+.text-muted {
+    color: #adb5bd;
+}
+
+    .doc-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-radius: 0;
+        position: static;
+        padding: 1rem;
+    }
+    .doc-content {
+        padding: 1rem;
+    }
+
+</style>
