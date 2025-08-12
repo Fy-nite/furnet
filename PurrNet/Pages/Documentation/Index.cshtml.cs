@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using purrnet.Pages.Shared;
-
+using purrnet.Documentation;
 namespace purrnet.Pages.Documentation
 {
     public class IndexModel : PageModel
