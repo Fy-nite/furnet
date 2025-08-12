@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using furnet.Services;
+using Purrnet.Services;
 
-namespace furnet.Controllers.Api
+namespace Purrnet.Controllers.Api
 {
     [ApiController]
     [Route("api/v1")]
@@ -56,9 +56,9 @@ namespace furnet.Controllers.Api
         {
             var info = new
             {
-                name = "FurNet Package Repository API",
+                name = "PurrNet Package Repository API",
                 version = "1.0.0",
-                description = "API for FUR package manager",
+                description = "API for Purr package manager",
                 endpoints = new
                 {
                     packages = "/api/v1/packages",

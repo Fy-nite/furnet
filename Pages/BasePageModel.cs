@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using furnet.Services;
+using Purrnet.Services;
 
-namespace furnet.Pages
+namespace Purrnet.Pages
 {
     public class BasePageModel : PageModel
     {

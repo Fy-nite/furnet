@@ -1,15 +1,15 @@
-# FurNet - Finite User Repository 
+# PurrNet - Finite User Repository 
 
 ## Overview
 
-FurNet is a web application for the Finite User Repository (FUR) package management system. It provides a user-friendly interface to browse, search, and submit packages to the FUR ecosystem.
+PurrNet is a web application for the Finite User Repository (Purr) package management system. It provides a user-friendly interface to browse, search, and submit packages to the Purr ecosystem.
 
 ## Features
 
 - **Package Browsing**: View all available packages with sorting and filtering options
 - **Package Details**: View comprehensive information about each package
 - **Package Submission**: Submit new packages to the repository through a web interface
-- **API Integration**: Seamlessly communicates with the FUR API backend
+- **API Integration**: Seamlessly communicates with the Purr API backend
 - **Responsive Design**: Works on desktop and mobile devices
 
 ## Technology Stack
@@ -30,8 +30,8 @@ FurNet is a web application for the Finite User Repository (FUR) package managem
 
 1. Clone the repository
     ```bash
-    git clone https://github.com/fy-nite/furnet.git
-    cd furnet
+    git clone https://github.com/fy-nite/Purrnet.git
+    cd Purrnet
     ```
 
 2. Run the application
@@ -43,11 +43,11 @@ FurNet is a web application for the Finite User Repository (FUR) package managem
 
 ## API Documentation
 
-FurNet integrates with the FUR API. For more details on available endpoints, refer to [api.md](api.md).
+PurrNet integrates with the Purr API. For more details on available endpoints, refer to [api.md](api.md).
 
 ## Package Configuration
 
-FurNet uses `furconfig.json` files to define package metadata. For detailed specifications, see [furconfig.md](furconfig.md).
+PurrNet uses `Purrconfig.json` files to define package metadata. For detailed specifications, see [Purrconfig.md](Purrconfig.md).
 
 ## Contributing
 
@@ -63,11 +63,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-- Project: FUR (Finite User Repository)
-- Website: [https://github.com/fy-nite/furnet](https://github.com/fy-nite/furnet)
+- Project: Purr (Finite User Repository)
+- Website: [https://github.com/fy-nite/Purrnet](https://github.com/fy-nite/Purrnet)
 - Issues: Please report issues through our issue tracker
 
-# FurNet
+# PurrNet
 
 ## Setup
 
@@ -75,7 +75,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 2. Update the GitHub OAuth credentials in `.env`:
    - Go to https://github.com/settings/applications/new
    - Create a new OAuth app
-   - Set Application name: `FurNet Testing`
+   - Set Application name: `PurrNet Testing`
    - Set Homepage URL: `http://testing.finite.ovh:8080`
    - Set Authorization callback URL: `http://testing.finite.ovh:8080/signin-github`
    - Copy Client ID and Client Secret to your `.env` file

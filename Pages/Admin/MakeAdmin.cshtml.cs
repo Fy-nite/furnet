@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using furnet.Services;
+using Purrnet.Services;
 
-namespace furnet.Pages.Admin
+namespace Purrnet.Pages.Admin
 {
     [Authorize]
     public class MakeAdminModel : BasePageModel

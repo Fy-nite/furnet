@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace furnet.Migrations
+namespace Purrnet.Migrations
 {
     /// <inheritdoc />
     public partial class AddUserPackageRelationships : Migration

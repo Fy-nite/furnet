@@ -1,5 +1,5 @@
 @page
-@model furnet.Pages.Packages.BrowseModel
+@model Purrnet.Pages.Packages.BrowseModel
 @{
     ViewData["Title"] = "Browse Packages";
 }
@@ -135,7 +135,7 @@
                         </div>
                     </div>
                     <div class="card-footer bg-transparent">
-                        <code class="text-primary">fur install @package.Name</code>
+                        <code class="text-primary">Purr install @package.Name</code>
                         @if (package.Dependencies.Any())
                         {
                             <small class="d-block mt-1 text-muted">

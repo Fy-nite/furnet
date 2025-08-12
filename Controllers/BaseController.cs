@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using furnet.Services;
+using Purrnet.Services;
 
-namespace furnet.Controllers
+namespace Purrnet.Controllers
 {
     public class BaseController : Controller
     {

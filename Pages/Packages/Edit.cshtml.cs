@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
-using furnet.Models;
-using furnet.Services;
+using Purrnet.Models;
+using Purrnet.Services;
 
-namespace furnet.Pages.Packages
+namespace Purrnet.Pages.Packages
 {
     [Authorize]
     public class EditModel : BasePageModel
@@ -197,7 +197,7 @@ namespace furnet.Pages.Packages
                     return Page();
                 }
 
-                var furConfig = new FurConfig
+                var PurrConfig = new PurrConfig
                 {
                     Name = PackageName.Trim(),
                     Version = Version.Trim(),
@@ -216,7 +216,7 @@ namespace furnet.Pages.Packages
                 };
 
                 var userName = User.Identity?.Name ?? "unknown";
-                var success = await _packageService.UpdatePackageAsync(PackageId, furConfig, userName);
+                var success = await _packageService.UpdatePackageAsync(PackageId, PurrConfig, userName);
 
                 if (success)
                 {
@@ -224,7 +224,7 @@ namespace furnet.Pages.Packages
                     IsSuccess = true;
                     
                     // Redirect to package details page
-                    return RedirectToPage("/Packages/Details", new { packageName = furConfig.Name });
+                    return RedirectToPage("/Packages/Details", new { packageName = PurrConfig.Name });
                 }
                 else
                 {

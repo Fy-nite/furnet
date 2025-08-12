@@ -1,12 +1,12 @@
-using furnet.Models;
+using Purrnet.Models;
 
-namespace furnet.Services
+namespace Purrnet.Services
 {
-    public interface IFurApiService
+    public interface IPurrApiService
     {
         Task<PackageListResponse?> GetPackagesAsync(string? sort = null, string? search = null);
-        Task<FurConfig?> GetPackageAsync(string packageName, string? version = null);
-        Task<bool> UploadPackageAsync(FurConfig furConfig);
+        Task<PurrConfig?> GetPackageAsync(string packageName, string? version = null);
+        Task<bool> UploadPackageAsync(PurrConfig PurrConfig);
         Task<bool> IsApiHealthyAsync();
         Task<List<Package>> GetPackageDetailsAsync(string? sort = null, string? search = null);
         void ClearCache();

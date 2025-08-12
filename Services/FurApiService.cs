@@ -1,13 +1,13 @@
-using furnet.Models;
+using Purrnet.Models;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace furnet.Services
+namespace Purrnet.Services
 {
-    public class FurApiService : IFurApiService
+    public class PurrApiService : IPurrApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<FurApiService> _logger;
+        private readonly ILogger<PurrApiService> _logger;
         private readonly IMemoryCache _cache;
         private readonly ILocalPackageService _localPackageService;
         private readonly string _baseUrl;
@@ -21,7 +21,7 @@ namespace furnet.Services
 
         public bool UseLocalStorage => !IsApiAvailable && _useLocalStorageWhenOffline;
 
-        public FurApiService(HttpClient httpClient, ILogger<FurApiService> logger, IMemoryCache cache, 
+        public PurrApiService(HttpClient httpClient, ILogger<PurrApiService> logger, IMemoryCache cache, 
             ILocalPackageService localPackageService, IConfiguration configuration)
         {
             _httpClient = httpClient;
@@ -103,7 +103,7 @@ namespace furnet.Services
             return GetCachedPackageResponse(sort, search);
         }
 
-        public async Task<FurConfig?> GetPackageAsync(string packageName, string? version = null)
+        public async Task<PurrConfig?> GetPackageAsync(string packageName, string? version = null)
         {
             // Try external API first
             try
@@ -117,7 +117,7 @@ namespace furnet.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<FurConfig>(content, new JsonSerializerOptions
+                    return JsonSerializer.Deserialize<PurrConfig>(content, new JsonSerializerOptions
                     {
                         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                     });
@@ -145,12 +145,12 @@ namespace furnet.Services
             return null;
         }
 
-        public async Task<bool> UploadPackageAsync(FurConfig furConfig)
+        public async Task<bool> UploadPackageAsync(PurrConfig PurrConfig)
         {
             // Try external API first
             try
             {
-                var json = JsonSerializer.Serialize(furConfig, new JsonSerializerOptions
+                var json = JsonSerializer.Serialize(PurrConfig, new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
                 });
@@ -162,19 +162,19 @@ namespace furnet.Services
                 {
                     // Clear cache since a new package was added
                     ClearCache();
-                    _logger.LogInformation("Package {PackageName} uploaded successfully, cache cleared", furConfig.Name);
+                    _logger.LogInformation("Package {PackageName} uploaded successfully, cache cleared", PurrConfig.Name);
                     return true;
                 }
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
                     _logger.LogError("Failed to upload package {PackageName}. Status: {StatusCode}, Error: {Error}", 
-                        furConfig.Name, response.StatusCode, errorContent);
+                        PurrConfig.Name, response.StatusCode, errorContent);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error uploading package {PackageName} to external API", furConfig.Name);
+                _logger.LogError(ex, "Error uploading package {PackageName} to external API", PurrConfig.Name);
             }
 
             // Fallback to local storage if configured
@@ -182,18 +182,18 @@ namespace furnet.Services
             {
                 try
                 {
-                    _logger.LogInformation("Saving package {PackageName} to local storage", furConfig.Name);
-                    var success = await _localPackageService.SavePackageAsync(furConfig);
+                    _logger.LogInformation("Saving package {PackageName} to local storage", PurrConfig.Name);
+                    var success = await _localPackageService.SavePackageAsync(PurrConfig);
                     if (success)
                     {
                         ClearCache();
-                        _logger.LogInformation("Package {PackageName} saved to local storage, cache cleared", furConfig.Name);
+                        _logger.LogInformation("Package {PackageName} saved to local storage, cache cleared", PurrConfig.Name);
                     }
                     return success;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error saving package {PackageName} to local storage", furConfig.Name);
+                    _logger.LogError(ex, "Error saving package {PackageName} to local storage", PurrConfig.Name);
                 }
             }
             
@@ -248,23 +248,23 @@ namespace furnet.Services
                     if (packageResponse?.PackageDetails != null)
                     {
                         IsApiAvailable = true;
-                        var packages = packageResponse.PackageDetails.Select(furConfig => new Package
+                        var packages = packageResponse.PackageDetails.Select(PurrConfig => new Package
                         {
-                            Name = furConfig.Name,
-                            Version = furConfig.Version,
-                            Authors = furConfig.Authors,
-                            SupportedPlatforms = furConfig.SupportedPlatforms,
-                            Description = furConfig.Description,
-                            ReadmeUrl = furConfig.ReadmeUrl,
-                            License = furConfig.License,
-                            LicenseUrl = furConfig.LicenseUrl,
-                            Keywords = furConfig.Keywords,
-                            Homepage = furConfig.Homepage,
-                            IssueTracker = furConfig.IssueTracker,
-                            Git = furConfig.Git,
-                            Installer = furConfig.Installer,
-                            InstallCommand = $"fur install {furConfig.Name}",
-                            Dependencies = furConfig.Dependencies,
+                            Name = PurrConfig.Name,
+                            Version = PurrConfig.Version,
+                            Authors = PurrConfig.Authors,
+                            SupportedPlatforms = PurrConfig.SupportedPlatforms,
+                            Description = PurrConfig.Description,
+                            ReadmeUrl = PurrConfig.ReadmeUrl,
+                            License = PurrConfig.License,
+                            LicenseUrl = PurrConfig.LicenseUrl,
+                            Keywords = PurrConfig.Keywords,
+                            Homepage = PurrConfig.Homepage,
+                            IssueTracker = PurrConfig.IssueTracker,
+                            Git = PurrConfig.Git,
+                            Installer = PurrConfig.Installer,
+                            InstallCommand = $"Purr install {PurrConfig.Name}",
+                            Dependencies = PurrConfig.Dependencies,
                             Downloads = Random.Shared.Next(100, 50000),
                             LastUpdated = DateTime.Now.AddDays(-Random.Shared.Next(1, 365))
                         }).ToList();
@@ -297,26 +297,26 @@ namespace furnet.Services
             {
                 foreach (var packageName in packageResponse.Packages)
                 {
-                    var furConfig = await GetPackageAsync(packageName);
-                    if (furConfig != null)
+                    var PurrConfig = await GetPackageAsync(packageName);
+                    if (PurrConfig != null)
                     {
                         packages.Add(new Package
                         {
-                            Name = furConfig.Name,
-                            Version = furConfig.Version,
-                            Authors = furConfig.Authors,
-                            SupportedPlatforms = furConfig.SupportedPlatforms,
-                            Description = furConfig.Description,
-                            ReadmeUrl = furConfig.ReadmeUrl,
-                            License = furConfig.License,
-                            LicenseUrl = furConfig.LicenseUrl,
-                            Keywords = furConfig.Keywords,
-                            Homepage = furConfig.Homepage,
-                            IssueTracker = furConfig.IssueTracker,
-                            Git = furConfig.Git,
-                            Installer = furConfig.Installer,
-                            InstallCommand = $"fur install {furConfig.Name}",
-                            Dependencies = furConfig.Dependencies,
+                            Name = PurrConfig.Name,
+                            Version = PurrConfig.Version,
+                            Authors = PurrConfig.Authors,
+                            SupportedPlatforms = PurrConfig.SupportedPlatforms,
+                            Description = PurrConfig.Description,
+                            ReadmeUrl = PurrConfig.ReadmeUrl,
+                            License = PurrConfig.License,
+                            LicenseUrl = PurrConfig.LicenseUrl,
+                            Keywords = PurrConfig.Keywords,
+                            Homepage = PurrConfig.Homepage,
+                            IssueTracker = PurrConfig.IssueTracker,
+                            Git = PurrConfig.Git,
+                            Installer = PurrConfig.Installer,
+                            InstallCommand = $"Purr install {PurrConfig.Name}",
+                            Dependencies = PurrConfig.Dependencies,
                             Downloads = Random.Shared.Next(100, 50000),
                             LastUpdated = DateTime.Now.AddDays(-Random.Shared.Next(1, 365))
                         });

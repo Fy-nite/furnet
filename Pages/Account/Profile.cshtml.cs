@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
-using furnet.Models;
-using furnet.Services;
+using Purrnet.Models;
+using Purrnet.Services;
 
-namespace furnet.Pages.Account
+namespace Purrnet.Pages.Account
 {
     [Authorize]
     public class ProfileModel : PageModel

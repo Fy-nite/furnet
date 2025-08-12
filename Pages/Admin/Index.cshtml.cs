@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using furnet.Models;
-using furnet.Services;
+using Purrnet.Models;
+using Purrnet.Services;
 
-namespace furnet.Pages.Admin
+namespace Purrnet.Pages.Admin
 {
     [Authorize]
     public class IndexModel : BasePageModel
@@ -15,7 +15,7 @@ namespace furnet.Pages.Admin
         public List<Package> Packages { get; set; } = new();
         public List<Package> PendingPackages { get; set; } = new();
         public PackageStatistics? Statistics { get; set; }
-        public List<furnet.Models.AdminActivity> RecentActivity { get; set; } = new();
+        public List<Purrnet.Models.AdminActivity> RecentActivity { get; set; } = new();
         public List<User> AllUsers { get; set; } = new();
         public string? Message { get; set; }
         public bool IsSuccess { get; set; }

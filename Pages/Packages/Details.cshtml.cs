@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using furnet.Models;
-using furnet.Services;
+using Purrnet.Models;
+using Purrnet.Services;
 
-namespace furnet.Pages.Packages
+namespace Purrnet.Pages.Packages
 {
     public class DetailsModel : PageModel
     {

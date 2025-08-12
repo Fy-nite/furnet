@@ -1,0 +1,104 @@
+﻿@page
+@model purrnet.Pages.Documentation.FAQModel
+@{
+    ViewData["Title"] = "Frequently Asked Questions (FAQ)";
+    Layout = "_Layout";
+    ViewData["Description"] = "Find answers to common questions about Purr package manager, including installation, usage, and troubleshooting.";
+    ViewData["Keywords"] = "Purr, FAQ, frequently asked questions, package manager, troubleshooting";
+    var FAQContent = new
+    {
+        Title = "Frequently Asked Questions (FAQ)",
+        Questions = new[]
+        {
+            new { Question = "What is Purr?", Answer = "Purr is a cross-platform package manager designed to simplify software installation and management." },
+            new { Question = "How do I install Purr?", Answer = "You can install Purr using the universal installer available on the <a href='/Download'>Downloads page</a>." },
+            new { Question = "How do I update Purr?", Answer = "To update Purr, run the command <code>purr update</code> in your terminal." },
+            new { Question = "How do I search for packages?", Answer = "Use the command <code>purr search &lt;package-name&gt;</code> to find packages." },
+            new { Question = "How do I install a package?", Answer = "Run <code>purr install &lt;package-name&gt;</code> to install a package." },
+            new { Question = "How do I uninstall a package?", Answer = "Use <code>purr uninstall &lt;package-name&gt;</code> to remove a package." },
+            new { Question = "Where can I find more help?", Answer = "Visit our <a href='/Documentation'>Documentation</a> or join our community on Discord for support." }
+        }
+    };
+}
+
+<style>
+/* Dark accordion overrides */
+.accordion-dark .accordion-item,
+.accordion-dark .accordion-header,
+.accordion-dark .accordion-button,
+.accordion-dark .accordion-body {
+    background-color: #23272b !important;
+    color: #f8f9fa !important;
+    border-color: #343a40 !important;
+}
+.accordion-dark .accordion-button:not(.collapsed) {
+    background-color: #23272b !important;
+    color: #f8f9fa !important;
+    box-shadow: none;
+}
+.accordion-dark .accordion-button:focus {
+    box-shadow: 0 0 0 0.2rem rgba(108,117,125,.5);
+}
+.accordion-dark .accordion-item {
+    border: 1px solid #343a40 !important;
+}
+</style>
+
+<div class="hero-section text-center py-5 mb-5 rounded-4 position-relative overflow-hidden">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-3">
+            <span class="bg-white bg-opacity-10 rounded-4 px-4 py-2 d-inline-block shadow-sm">
+                <i class="bi bi-question-circle text-primary"></i> Frequently Asked Questions (FAQ)
+            </span>
+        </h1>
+        <p class="lead mb-4">Find answers to common questions about Purr package manager, including installation, usage, and troubleshooting.</p>
+    </div>
+</div>
+<div class="container mb-5">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <div class="card h-100 shadow-sm mb-4 bg-dark-subtle text-body">
+                <div class="card-body">
+                    <h2 class="card-title about-feature-card-title mb-4 text-body">
+                        <i class="bi bi-question-circle"></i> Frequently Asked Questions
+                    </h2>
+                    <p class="mb-4 text-body">Here are some common questions and answers about Purr:</p>
+                    <div class="accordion accordion-dark" id="faqAccordion">
+                        @foreach (var item in FAQContent.Questions)
+                        {
+                            <div class="accordion-item bg-dark border-dark">
+                                <h2 class="accordion-header" id="faqHeading@(item.Question.GetHashCode())">
+                                    <button class="accordion-button bg-dark text-light border-dark" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse@(item.Question.GetHashCode())" aria-expanded="true" aria-controls="faqCollapse@(item.Question.GetHashCode())">
+                                        @item.Question
+                                    </button>
+                                </h2>
+                                <div id="faqCollapse@(item.Question.GetHashCode())" class="accordion-collapse collapse" aria-labelledby="faqHeading@(item.Question.GetHashCode())" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body bg-dark text-light">
+                                        @Html.Raw(item.Answer)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card h-100 shadow-sm mb-4 bg-dark-subtle text-body">
+                <div class="card-body">
+                    <h4 class="card-title about-feature-card-title mb-3 text-body">
+                        <i class="bi bi-chat text-primary"></i> Need More Help
+                    </h4>
+                    <p class="text-body">If you have more questions or need assistance, feel free to reach out:</p>
+                    <ul class="text-body">
+                        <li>Check our <a href="/Documentation" class="text-info">Documentation</a> for detailed guides and tutorials.</li>
+                        <li>Join our community on <a href="https://discord.gg/your-discord-link" class="text-info">Discord</a> for real-time support and discussions.</li>
+                        <li>Visit our <a href="/Contact" class="text-info">Contact page</a> to get in touch with the Purr team.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

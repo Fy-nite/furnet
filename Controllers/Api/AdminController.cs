@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using furnet.Services;
+using Purrnet.Services;
 using System.Security.Claims;
 
-namespace furnet.Controllers.Api
+namespace Purrnet.Controllers.Api
 {
     [ApiController]
     [Route("api/v1/admin")]

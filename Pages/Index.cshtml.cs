@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using furnet.Services;
-using furnet.Models;
+using Purrnet.Services;
+using Purrnet.Models;
 
-namespace furnet.Pages
+namespace Purrnet.Pages
 {
     public class IndexModel : BasePageModel
     {
@@ -13,6 +13,7 @@ namespace furnet.Pages
         public List<Package> Packages { get; set; } = new();
         public PackageStatistics? Statistics { get; set; }
         public string? ErrorMessage { get; set; }
+        public List<Package> TopDownloadedPackages { get; set; } = new();
 
         public IndexModel(IPackageService packageService, ILogger<IndexModel> logger, TestingModeService testingModeService)
             : base(testingModeService)
@@ -28,6 +29,7 @@ namespace furnet.Pages
                 var searchResult = await _packageService.SearchPackagesAsync(search, sort, 1, 50);
                 Packages = searchResult.Packages;
                 Statistics = await _packageService.GetStatisticsAsync();
+                TopDownloadedPackages = Statistics?.MostDownloaded?.Take(5).ToList() ?? new List<Package>();
             }
             catch (Exception ex)
             {

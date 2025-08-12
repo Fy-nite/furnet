@@ -1,0 +1,76 @@
+﻿@page
+@model purrnet.Pages.Documentation.HowToInstallModel
+@{
+    ViewData["Title"] = "How to Install Purr";
+    Layout = "_Layout";
+    ViewData["Description"] = "Learn how to install the Purr package manager on various platforms including Windows, macOS, and Linux.";
+    ViewData["Keywords"] = "Purr, installation, package manager, Windows, macOS, Linux";
+}
+
+<div class="hero-section text-center py-5 mb-5 rounded-4 position-relative overflow-hidden">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-3">
+            <span class="bg-white bg-opacity-10 rounded-4 px-4 py-2 d-inline-block shadow-sm">
+                <i class="bi bi-box-arrow-in-down text-primary"></i> How to Install Purr
+            </span>
+        </h1>
+        <p class="lead mb-4">Purr uses a universal cross-platform installer. Just download and run it for your OS!</p>
+    </div>
+</div>
+<div class="container mb-5">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <div class="card h-100 shadow-sm mb-4">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">
+                        <i class="bi bi-info-circle"></i> Universal Installation Guide
+                    </h2>
+                    <p class="mb-4">Purr is powered by .NET and ships as a single universal installer for Windows, macOS, and Linux. Download the latest installer from the <a href="/Download" class="text-primary">Downloads page</a> and follow the steps below for your platform.</p>
+
+                    <h4 class="mt-4"><i class="bi bi-windows text-primary"></i> Windows</h4>
+                    <ol>
+                        <li>Download the <strong>Purr Universal Installer</strong> from the <a href="/Download" class="text-primary">Downloads page</a>.</li>
+                        <li>Double-click the installer and follow the on-screen instructions.</li>
+                        <li>After installation, open Command Prompt and verify installation:
+                            <pre><code>purr --version</code></pre>
+                        </li>
+                    </ol>
+
+                    <h4 class="mt-4"><i class="bi bi-apple text-primary"></i> macOS</h4>
+                    <ol>
+                        <li>Download the <strong>Purr Universal Installer</strong> from the <a href="/Download" class="text-primary">Downloads page</a>.</li>
+                        <li>Open Terminal, navigate to your Downloads folder, and run:
+                            <pre><code>dotnet pur-installer</code></pre>
+                        </li>
+                        <li>Follow the prompts to complete installation.</li>
+                        <li>Verify installation:
+                            <pre><code>purr --version</code></pre>
+                        </li>
+                    </ol>
+
+                    <h4 class="mt-4"><i class="bi bi-linux text-primary"></i> Linux</h4>
+                    <ol>
+                        <li>Download the <strong>Purr Universal Installer</strong> from the <a href="/Download" class="text-primary">Downloads page</a>.</li>
+                        <li>Open Terminal, navigate to your Downloads folder, and run:
+                            <pre><code>dotnet pur-installer</code></pre>
+                        </li>
+                        <li>Follow the prompts to complete installation.</li>
+                        <li>Verify installation:
+                            <pre><code>purr --version</code></pre>
+                        </li>
+                    </ol>
+
+                    <div class="alert alert-info mt-4">
+                        <i class="bi bi-lightbulb"></i> <strong>Note:</strong> The Purr installer is cross-platform and powered by .NET, so it works on any modern Windows, macOS, or Linux system.
+                    </div>
+
+                    <h5 class="mt-5"><i class="bi bi-question-circle"></i> Troubleshooting</h5>
+                    <ul>
+                        <li>If you encounter issues, ensure your system PATH includes the Purr installation directory.</li>
+                        <li>See the <a href="/Documentation/FAQ" class="text-primary">FAQ</a> or <a href="/Contact" class="text-primary">contact support</a> for help.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

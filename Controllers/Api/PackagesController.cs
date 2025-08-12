@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using furnet.Models;
-using furnet.Services;
+using Purrnet.Models;
+using Purrnet.Services;
 
-namespace furnet.Controllers.Api
+namespace Purrnet.Controllers.Api
 {
     [ApiController]
     [Route("api/v1/packages")]
@@ -45,7 +45,7 @@ namespace furnet.Controllers.Api
 
                 if (details)
                 {
-                    response.PackageDetails = searchResult.Packages.Select(p => new FurConfig
+                    response.PackageDetails = searchResult.Packages.Select(p => new PurrConfig
                     {
                         Name = p.Name,
                         Version = p.Version,
@@ -76,7 +76,7 @@ namespace furnet.Controllers.Api
 
         [HttpGet("{packageName}")]
         [HttpGet("{packageName}/{version}")]
-        public async Task<ActionResult<FurConfig>> GetPackageAsync(string packageName, string? version = null)
+        public async Task<ActionResult<PurrConfig>> GetPackageAsync(string packageName, string? version = null)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace furnet.Controllers.Api
                 // Increment view count
                 await _packageService.IncrementViewCountAsync(package.Id);
 
-                var furConfig = new FurConfig
+                var PurrConfig = new PurrConfig
                 {
                     Name = package.Name,
                     Version = package.Version,
@@ -112,7 +112,7 @@ namespace furnet.Controllers.Api
                     Dependencies = package.Dependencies
                 };
 
-                return Ok(furConfig);
+                return Ok(PurrConfig);
             }
             catch (Exception ex)
             {
@@ -123,7 +123,7 @@ namespace furnet.Controllers.Api
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<FurConfig>> UploadPackageAsync([FromBody] FurConfig furConfig)
+        public async Task<ActionResult<PurrConfig>> UploadPackageAsync([FromBody] PurrConfig PurrConfig)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -144,16 +144,16 @@ namespace furnet.Controllers.Api
                 }
 
                 var userName = User.Identity?.Name ?? "api-user";
-                var success = await _packageService.SavePackageAsync(furConfig, userName, userId);
+                var success = await _packageService.SavePackageAsync(PurrConfig, userName, userId);
                 
                 if (!success)
                     return Conflict("Package already exists or failed to upload");
 
-                return CreatedAtAction(nameof(GetPackageAsync), new { packageName = furConfig.Name }, furConfig);
+                return CreatedAtAction(nameof(GetPackageAsync), new { packageName = PurrConfig.Name }, PurrConfig);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error uploading package {PackageName}", furConfig.Name);
+                _logger.LogError(ex, "Error uploading package {PackageName}", PurrConfig.Name);
                 return StatusCode(500, "Internal server error");
             }
         }

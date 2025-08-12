@@ -1,4 +1,4 @@
-namespace furnet.Extensions
+namespace Purrnet.Extensions
 {
     public static class StringExtensions
     {

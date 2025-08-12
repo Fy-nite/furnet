@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace furnet.Pages.Account
+namespace Purrnet.Pages.Account
 {
     public class LoginModel : PageModel
     {

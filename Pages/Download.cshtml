@@ -1,0 +1,71 @@
+﻿@page
+@model purrnet.Pages.DownloadModel
+@{
+    ViewData["Title"] = "Download";
+    Layout = "_Layout";
+    ViewData["Description"] = "Download the latest version of Purr package manager for your platform.";
+    ViewData["Keywords"] = "Purr, download, package manager, Windows, macOS, Linux";
+}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Add download links dynamically
+        document.querySelectorAll('[name="windows-download"]').forEach(function(el) {
+            el.href = '/downloads/purr-windows-latest.exe';
+        });
+        document.querySelectorAll('[name="macOS-download"]').forEach(function(el) {
+            el.href = '/downloads/purr-macos-latest.pkg';
+        });
+        document.querySelectorAll('[name="linux-download"]').forEach(function(el) {
+            el.href = '/downloads/purr-linux-latest.tar.gz';
+        });
+    });
+</script>
+<div class="hero-section text-center py-5 mb-5 rounded-4 position-relative overflow-hidden">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-3">
+            <span class="bg-white bg-opacity-10 rounded-4 px-4 py-2 d-inline-block shadow-sm">
+                <i class="bi bi-download text-primary"></i> Download Purr
+            </span>
+        </h1>
+        <p class="lead mb-4">Get the latest version of the Purr package manager for your platform.</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Universal Installer</h5>
+                    <p class="card-text">Download the latest Purr multiplatform installer for Windows, macOS, and Linux.</p>
+                    <a href="/downloads/purr-latest-installer.exe" class="btn btn-primary w-100" name="universal-download">
+                        <i class="bi bi-download"></i> Download Installer
+                    </a>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow rounded-4 mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-3"><i class="bi bi-terminal"></i> Install via CLI</h4>
+            <p>If downloading a installer doesnt work for you, you can also install Purr using the command line:</p>
+            <p>Open a PowerShell terminal (version 5.1 or later) and from the PS C:\> prompt, run:</p>
+            <pre><code>Invoke-RestMethod -Uri https://purr.finite.ovh/install.ps1 | Invoke-Expression </code></pre>
+            <p class="mb-0">Or see the <a href="/Documentation/HowToInstall" class="text-primary">documentation</a> for advanced installation options.</p>
+        </div>
+    </div>
+
+    <!-- Optional: Checksums or release notes -->
+    <!--
+    <div class="card border-0 shadow rounded-4 mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi bi-file-earmark-text"></i> Release Notes & Checksums</h5>
+            <ul>
+                <li><a href="#">Release Notes (v1.0.0)</a></li>
+                <li><code>SHA256: ...</code></li>
+            </ul>
+        </div>
+    </div>
+    -->
+</div>

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using furnet.Data;
-using furnet.Services;
+using Purrnet.Data;
+using Purrnet.Services;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
@@ -39,7 +39,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 
 // Add Entity Framework
-builder.Services.AddDbContext<FurDbContext>(options =>
+builder.Services.AddDbContext<PurrDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add memory cache
@@ -71,7 +71,7 @@ builder.Services.AddAuthentication(options =>
     options.LogoutPath = "/Account/Logout";
     options.ExpireTimeSpan = TimeSpan.FromHours(24);
     options.SlidingExpiration = true;
-    options.Cookie.Name = ".AspNetCore.FurNet.Auth";
+    options.Cookie.Name = ".AspNetCore.PurrNet.Auth";
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.Cookie.SameSite = SameSiteMode.Lax;
@@ -86,8 +86,8 @@ builder.Services.AddAuthentication(options =>
         // Force clear all auth cookies
         var cookiesToClear = new[] 
         {
-            ".AspNetCore.FurNet.Auth.",
-            ".AspNetCore.FurNet.Correlation.",
+            ".AspNetCore.PurrNet.Auth.",
+            ".AspNetCore.PurrNet.Correlation.",
             ".AspNetCore.Antiforgery.",
             ".AspNetCore.Session."
         };
@@ -113,7 +113,7 @@ builder.Services.AddAuthentication(options =>
     options.CallbackPath = new PathString("/signin-github");
     
     // Fix correlation issues with custom domain
-    options.CorrelationCookie.Name = ".AspNetCore.FurNet.Correlation";
+    options.CorrelationCookie.Name = ".AspNetCore.PurrNet.Correlation";
     options.CorrelationCookie.SameSite = SameSiteMode.Lax;
     options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.CorrelationCookie.HttpOnly = true;
@@ -176,14 +176,14 @@ var app = builder.Build();
 // Ensure database is created - Comment out this section since we're using migrations now
 // using (var scope = app.Services.CreateScope())
 // {
-//     var context = scope.ServiceProvider.GetRequiredService<FurDbContext>();
+//     var context = scope.ServiceProvider.GetRequiredService<PurrDbContext>();
 //     context.Database.EnsureCreated();
 // }
 
 // Instead, apply migrations automatically
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<FurDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<PurrDbContext>();
     context.Database.Migrate();
 }
 

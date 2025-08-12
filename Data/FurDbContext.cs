@@ -1,13 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using furnet.Models;
+using Purrnet.Models;
 using System.Text.Json;
 
-namespace furnet.Data
+namespace Purrnet.Data
 {
-    public class FurDbContext : DbContext
+    public class PurrDbContext : DbContext
     {
-        public FurDbContext(DbContextOptions<FurDbContext> options) : base(options) { }
-
+        public PurrDbContext(DbContextOptions<PurrDbContext> options) : base(options) { }
         public DbSet<Package> Packages { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<AdminActivityEntity> AdminActivities { get; set; }

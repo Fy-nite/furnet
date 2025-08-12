@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using furnet.Data;
-using furnet.Models;
+using Purrnet.Data;
+using Purrnet.Models;
 
-namespace furnet.Commands
+namespace Purrnet.Commands
 {
     public static class AdminCommand
     {
@@ -17,11 +17,11 @@ namespace furnet.Commands
             var command = args[1];
             var connectionString = GetConnectionString();
 
-            var options = new DbContextOptionsBuilder<FurDbContext>()
+            var options = new DbContextOptionsBuilder<PurrDbContext>()
                 .UseSqlite(connectionString)
                 .Options;
 
-            using var context = new FurDbContext(options);
+            using var context = new PurrDbContext(options);
 
             return command.ToLower() switch
             {
@@ -33,7 +33,7 @@ namespace furnet.Commands
             };
         }
 
-        private static async Task<int> PromoteUserAsync(FurDbContext context, string username)
+        private static async Task<int> PromoteUserAsync(PurrDbContext context, string username)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace furnet.Commands
             }
         }
 
-        private static async Task<int> RevokeAdminAsync(FurDbContext context, string username)
+        private static async Task<int> RevokeAdminAsync(PurrDbContext context, string username)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace furnet.Commands
             }
         }
 
-        private static async Task<int> ListAdminsAsync(FurDbContext context)
+        private static async Task<int> ListAdminsAsync(PurrDbContext context)
         {
             try
             {
@@ -123,7 +123,7 @@ namespace furnet.Commands
             }
         }
 
-        private static async Task<int> ListAllUsersAsync(FurDbContext context)
+        private static async Task<int> ListAllUsersAsync(PurrDbContext context)
         {
             try
             {
@@ -156,12 +156,12 @@ namespace furnet.Commands
         private static string GetConnectionString()
         {
             // Try to get from environment variable first, then fallback to default
-            return Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? "Data Source=furnet.db";
+            return Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? "Data Source=Purrnet.db";
         }
 
         private static int ShowHelp()
         {
-            Console.WriteLine("FurNet Admin Management Tool");
+            Console.WriteLine("PurrNet Admin Management Tool");
             Console.WriteLine();
             Console.WriteLine("Usage:");
             Console.WriteLine("  dotnet run -- --admin <command> [options]");

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace furnet.Pages.Account
+namespace Purrnet.Pages.Account
 {
     public class LogoutModel : PageModel
     {
@@ -43,8 +43,8 @@ namespace furnet.Pages.Account
                 // Delete authentication cookies explicitly
                 var cookiesToDelete = new[]
                 {
-                    ".AspNetCore.FurNet.Auth",
-                    ".AspNetCore.FurNet.Correlation", 
+                    ".AspNetCore.PurrNet.Auth",
+                    ".AspNetCore.PurrNet.Correlation", 
                     ".AspNetCore.Antiforgery",
                     ".AspNetCore.Session"
                 };

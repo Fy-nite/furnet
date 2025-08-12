@@ -1,15 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using furnet.Data;
-using furnet.Models;
+using Purrnet.Data;
+using Purrnet.Models;
 
-namespace furnet.Services
+namespace Purrnet.Services
 {
     public class AdminService : IAdminService
     {
-        private readonly FurDbContext _context;
+        private readonly PurrDbContext _context;
         private readonly ILogger<AdminService> _logger;
 
-        public AdminService(FurDbContext context, ILogger<AdminService> logger)
+        public AdminService(PurrDbContext context, ILogger<AdminService> logger)
         {
             _context = context;
             _logger = logger;

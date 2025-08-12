@@ -1,4 +1,4 @@
-# FUR API Documentation
+# Purr API Documentation
 
 Base URL: `http://testing.finite.ovh:8080/api/v1` (Testing) | `https://your-domain.com/api/v1` (Production)
 
@@ -62,7 +62,7 @@ Gets all packages with optional filtering and pagination.
 ### `GET /packages/{packageName}/{version}`
 Gets detailed information about a specific package.
 
-**Response:** Returns the FurConfig JSON for the package.
+**Response:** Returns the PurrConfig JSON for the package.
 
 ### `POST /packages`
 Uploads a new package (requires web-based authentication).

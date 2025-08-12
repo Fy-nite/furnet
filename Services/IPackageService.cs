@@ -1,6 +1,6 @@
-using furnet.Models;
+using Purrnet.Models;
 
-namespace furnet.Services
+namespace Purrnet.Services
 {
     public interface IPackageService
     {
@@ -8,9 +8,9 @@ namespace furnet.Services
         Task<List<Package>> GetAllPackagesAsync();
         Task<Package?> GetPackageAsync(string packageName, string? version = null);
         Task<Package?> GetPackageByIdAsync(int id);
-        Task<bool> SavePackageAsync(FurConfig furConfig, string createdBy, int? ownerId = null);
-        Task<bool> SavePackageAsync(FurConfig furConfig, string createdBy); // Overload for backward compatibility
-        Task<bool> UpdatePackageAsync(int id, FurConfig furConfig, string? updatedBy = null);
+        Task<bool> SavePackageAsync(PurrConfig PurrConfig, string createdBy, int? ownerId = null);
+        Task<bool> SavePackageAsync(PurrConfig PurrConfig, string createdBy); // Overload for backward compatibility
+        Task<bool> UpdatePackageAsync(int id, PurrConfig PurrConfig, string? updatedBy = null);
         Task<bool> DeletePackageAsync(int id);
         Task<bool> TogglePackageStatusAsync(int id);
 

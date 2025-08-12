@@ -1,5 +1,5 @@
 @page "/Packages/Details/{packageName}"
-@model furnet.Pages.Packages.DetailsModel
+@model Purrnet.Pages.Packages.DetailsModel
 @{
     ViewData["Title"] = $"{Model.Package?.Name ?? "Package"} - Package Details";
     
@@ -9,7 +9,7 @@
         ViewData["MetaTitle"] = $"{Model.Package.Name} v{Model.Package.Version}";
         ViewData["MetaDescription"] = !string.IsNullOrEmpty(Model.Package.Description) 
             ? Model.Package.Description 
-            : $"Install {Model.Package.Name} using FUR package manager";
+            : $"Install {Model.Package.Name} using Purr package manager";
         ViewData["MetaImage"] = $"{Request.Scheme}://{Request.Host}/images/package-preview.png";
         ViewData["MetaUrl"] = $"{Request.Scheme}://{Request.Host}/Packages/Details/{Model.Package.Name}";
         ViewData["MetaKeywords"] = string.Join(", ", Model.Package.Keywords);
@@ -30,7 +30,7 @@
         <meta property="og:description" content="@ViewData["MetaDescription"]" />
         <meta property="og:url" content="@ViewData["MetaUrl"]" />
         <meta property="og:image" content="@ViewData["MetaImage"]" />
-        <meta property="og:site_name" content="FurNet - Finite User Repository" />
+        <meta property="og:site_name" content="PurrNet - Finite User Repository" />
         
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image" />
@@ -44,11 +44,11 @@
         <meta name="package:authors" content="@ViewData["MetaAuthors"]" />
         <meta name="package:downloads" content="@ViewData["MetaDownloads"]" />
         <meta name="package:last_updated" content="@ViewData["MetaLastUpdated"]" />
-        <meta name="package:install_command" content="fur install @Model.Package.Name" />
+        <meta name="package:install_command" content="Purr install @Model.Package.Name" />
         
         <!-- Standard meta tags -->
         <meta name="description" content="@ViewData["MetaDescription"]" />
-        <meta name="keywords" content="@ViewData["MetaKeywords"], fur, package manager, @ViewData["MetaPackageName"]" />
+        <meta name="keywords" content="@ViewData["MetaKeywords"], Purr, package manager, @ViewData["MetaPackageName"]" />
         <meta name="author" content="@ViewData["MetaAuthors"]" />
         
         <!-- Rich snippets / JSON-LD -->
@@ -67,7 +67,7 @@
             "offers": {
                 "@@type": "Offer",
                 "price": "0",
-                "priceCurrency": "USD"
+                "priceCurrency": "USD"`
             },
             "aggregateRating": {
                 "@@type": "AggregateRating",
@@ -249,9 +249,9 @@
                     <h5 class="mb-0">Installation</h5>
                 </div>
                 <div class="card-body">
-                    <p class="mb-2">Install this package using FUR:</p>
-                    <div class="bg-dark text-dark p-2 rounded">
-                        <code class="text-dark">@Model.Package.InstallCommand</code>
+                    <p class="mb-2">Install this package using Purr:</p>
+                    <div class="bg-dark text-white p-2 rounded">
+                        <code class="text-white">@Model.Package.InstallCommand</code>
                     </div>
                 </div>
             </div>

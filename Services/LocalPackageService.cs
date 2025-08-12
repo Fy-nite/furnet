@@ -1,8 +1,8 @@
-using furnet.Models;
+using Purrnet.Models;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace furnet.Services
+namespace Purrnet.Services
 {
     public class LocalPackageService : ILocalPackageService
     {
@@ -38,9 +38,9 @@ namespace furnet.Services
             }
         }
 
-        public async Task<List<FurConfig>> GetAllPackagesAsync()
+        public async Task<List<PurrConfig>> GetAllPackagesAsync()
         {
-            var packages = new List<FurConfig>();
+            var packages = new List<PurrConfig>();
 
             try
             {
@@ -51,11 +51,11 @@ namespace furnet.Services
                 
                 foreach (var packageDir in packageDirs)
                 {
-                    var configPath = Path.Combine(packageDir, "furconfig.json");
+                    var configPath = Path.Combine(packageDir, "Purrconfig.json");
                     if (File.Exists(configPath))
                     {
                         var jsonContent = await File.ReadAllTextAsync(configPath);
-                        var package = JsonSerializer.Deserialize<FurConfig>(jsonContent, _jsonOptions);
+                        var package = JsonSerializer.Deserialize<PurrConfig>(jsonContent, _jsonOptions);
                         if (package != null)
                         {
                             packages.Add(package);
@@ -71,19 +71,19 @@ namespace furnet.Services
             return packages;
         }
 
-        public async Task<FurConfig?> GetPackageAsync(string packageName, string? version = null)
+        public async Task<PurrConfig?> GetPackageAsync(string packageName, string? version = null)
         {
             try
             {
                 var sanitizedName = SanitizePackageName(packageName);
                 var packageDir = Path.Combine(_packagesDirectory, sanitizedName);
-                var configPath = Path.Combine(packageDir, "furconfig.json");
+                var configPath = Path.Combine(packageDir, "Purrconfig.json");
 
                 if (!File.Exists(configPath))
                     return null;
 
                 var jsonContent = await File.ReadAllTextAsync(configPath);
-                var package = JsonSerializer.Deserialize<FurConfig>(jsonContent, _jsonOptions);
+                var package = JsonSerializer.Deserialize<PurrConfig>(jsonContent, _jsonOptions);
 
                 if (package != null && (version == null || package.Version == version))
                 {
@@ -98,11 +98,11 @@ namespace furnet.Services
             return null;
         }
 
-        public async Task<bool> SavePackageAsync(FurConfig furConfig)
+        public async Task<bool> SavePackageAsync(PurrConfig PurrConfig)
         {
             try
             {
-                var sanitizedName = SanitizePackageName(furConfig.Name);
+                var sanitizedName = SanitizePackageName(PurrConfig.Name);
                 var packageDir = Path.Combine(_packagesDirectory, sanitizedName);
                 
                 if (!Directory.Exists(packageDir))
@@ -110,17 +110,17 @@ namespace furnet.Services
                     Directory.CreateDirectory(packageDir);
                 }
 
-                var configPath = Path.Combine(packageDir, "furconfig.json");
-                var jsonContent = JsonSerializer.Serialize(furConfig, _jsonOptions);
+                var configPath = Path.Combine(packageDir, "Purrconfig.json");
+                var jsonContent = JsonSerializer.Serialize(PurrConfig, _jsonOptions);
                 
                 await File.WriteAllTextAsync(configPath, jsonContent);
                 
-                _logger.LogInformation("Package {PackageName} saved to local storage", furConfig.Name);
+                _logger.LogInformation("Package {PackageName} saved to local storage", PurrConfig.Name);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error saving package {PackageName} to local storage", furConfig.Name);
+                _logger.LogError(ex, "Error saving package {PackageName} to local storage", PurrConfig.Name);
                 return false;
             }
         }
@@ -202,9 +202,9 @@ namespace furnet.Services
 
         private async Task CreateDefaultPackagesAsync()
         {
-            var defaultPackages = new List<FurConfig>
+            var defaultPackages = new List<PurrConfig>
             {
-                new FurConfig
+                new PurrConfig
                 {
                     Name = "web-framework",
                     Version = "2.1.0",
@@ -220,7 +220,7 @@ namespace furnet.Services
                     Installer = "install.sh",
                     Dependencies = new List<string> { "make@latest", "gcc@9.0.0" }
                 },
-                new FurConfig
+                new PurrConfig
                 {
                     Name = "json-parser",
                     Version = "1.5.3",

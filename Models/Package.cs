@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace furnet.Models
+namespace Purrnet.Models
 {
     public class Package
     {
@@ -60,7 +60,7 @@ namespace furnet.Models
         public string? Changelog { get; set; }
 
         // Package approval system
-        public string ApprovalStatus { get; set; } = "Approved"; // Default to Approved for backward compatibility
+        public string ApprovalStatus { get; set; } = "Pending"; // Default to Approved for backward compatibility
         public int? OwnerId { get; set; }
         public string? RejectionReason { get; set; }
 
@@ -69,7 +69,7 @@ namespace furnet.Models
         public List<User> Maintainers { get; set; } = new();
     }
 
-    public class FurConfig
+    public class PurrConfig
     {
         [JsonPropertyName("name")]
         [Required]
@@ -131,7 +131,7 @@ namespace furnet.Models
         public List<string> Packages { get; set; } = new();
         
         [JsonPropertyName("package_details")]
-        public List<FurConfig>? PackageDetails { get; set; }
+        public List<PurrConfig>? PackageDetails { get; set; }
     }
 
     public class PackageStatistics

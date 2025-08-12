@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if we're in testing mode (passed from server)
     const isTestingMode = document.body.getAttribute('data-testing-mode') === 'true';
     if (isTestingMode) {
-        console.log('🧪 FurNet is running in testing mode');
+        console.log('🧪 PurrNet is running in testing mode');
     }
     
     // Check for logout completion and force cleanup

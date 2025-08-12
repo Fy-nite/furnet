@@ -2,17 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using furnet.Data;
+using Purrnet.Data;
 
-namespace furnet.Pages.Admin
+namespace Purrnet.Pages.Admin
 {
     [Authorize]
     public class SetupModel : PageModel
     {
-        private readonly FurDbContext _context;
+        private readonly PurrDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public SetupModel(FurDbContext context, IConfiguration configuration)
+        public SetupModel(PurrDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;

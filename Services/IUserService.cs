@@ -1,6 +1,6 @@
-using furnet.Models;
+using Purrnet.Models;
 
-namespace furnet.Services
+namespace Purrnet.Services
 {
     public interface IUserService
     {

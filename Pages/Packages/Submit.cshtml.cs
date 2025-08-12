@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
 using System.ComponentModel.DataAnnotations;
-using furnet.Models;
-using furnet.Services;
+using Purrnet.Models;
+using Purrnet.Services;
 
-namespace furnet.Pages.Packages
+namespace Purrnet.Pages.Packages
 {
     [Authorize]
     public class SubmitModel : BasePageModel
@@ -129,7 +129,7 @@ namespace furnet.Pages.Packages
                     return Page();
                 }
 
-                var furConfig = new FurConfig
+                var PurrConfig = new PurrConfig
                 {
                     Name = PackageName.Trim(),
                     Version = Version.Trim(),
@@ -154,7 +154,7 @@ namespace furnet.Pages.Packages
                     userId = parsedUserId;
                 }
                 
-                var success = await _packageService.SavePackageAsync(furConfig, userName, userId);
+                var success = await _packageService.SavePackageAsync(PurrConfig, userName, userId);
 
                 if (success)
                 {
@@ -177,7 +177,7 @@ namespace furnet.Pages.Packages
                     Categories = null;
                     
                     // Redirect to package details page
-                    return RedirectToPage("/Packages/Details", new { packageName = furConfig.Name });
+                    return RedirectToPage("/Packages/Details", new { packageName = PurrConfig.Name });
                 }
                 else
                 {
