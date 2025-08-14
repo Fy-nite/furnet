@@ -71,6 +71,8 @@ namespace PurrInstaller
             Console.WriteLine($"Latest Purr version: {latestVersion}");
             Console.WriteLine();
             Console.WriteLine("where do you want to install purr to?");
+            var input = Console.ReadLine();
+
         }
     }
 }
